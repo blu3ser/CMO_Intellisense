@@ -1,0 +1,54 @@
+CMO Objects Function Constants Changelog 
+-----------------------------------------
+
+
+11-13-2021 (CMO Builds 1147.31 through 1147.35) 
+----
+Unit Wrapper/Object:
++airbornetime_v property
+~airbornetime property tweaked comment. (removed notice about lack of _v version)
++readytime_v property 
+~readytime property tweaked comment. (removed notice about lack of _v version)
++crew property 
++jammed property
++jammer property
++groundspeed property
++pitch property
+
+~filterOnComponent() method - updated for optional dbid second param. 
++angleOnBowToUnit() method
++getUnitMagazine() method
+^ Added related CMO__DeviceMagazine class and properties.
+  Added setExactWeaponQuantity() method to CMO__DeviceMagazine class. 
+  Added related CMO__TableOfDeviceWeaponLoads alias for DeviceMagazine.weapons property
+  Added related CMO__DeviceWeaponLoaded table and properties (for .weapons table entries as it's different from regular CMO__WeaponLoaded table as it's missing wpn_type).
++getUnitMountMagazine() method
+
+CMO__Loadout Wrapper/Object:
++setExactWeaponQuantity() method
+
+Scenario Wrapper/Object:
++fields property
++ContentTag property
++GameMode property byte (don't know what values represent yet)
++GameStatus property byte (don't know what values represent yet)
++ResetLossExp() method 
++ResetScore() method
+
+Contact Wrapper/Object:
++ lastDetections property table
++ CMO__ContactDetection class containing properties for each lastDetection table entry (though little unclear what the values for special_mode are just yet).
++ CMO__TableOfContactDetections alias representing table of <number,CMO__ContactDetection>
+
+Other
++Added CMO__DeviceMount definition (wasn't really unneccessary atm but maybe in future)
+~tweaked a few field types for CMO__WeaponLoaded (couple of things were marked as strings when they were ints/numbers)
+~minor text\decriptions tweaked in a few other places.
+~changelog added to distribution.
+
+
+8-30-2021 (Build 1147.30)
+----
+initial release.
+
+
