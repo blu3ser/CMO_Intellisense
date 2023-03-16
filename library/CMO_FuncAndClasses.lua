@@ -187,7 +187,7 @@ function CMO__Enum_Table:Doctrine(name)end
 ---@field clear? boolean @ set this to true to remove the 'relative to' portion of the the reference point when using SetRefferencePoint()
 ---@field highlighted? boolean @ True to flip the reference point(s)highlight, false to turn it off/deselect it.  (wrong in the documentation as togglehighlighted)
 ---@field locked? boolean @ true to se the reference point to locked, false to unlock
----@field bearingType? number @ one of 'Fixed' or 'Rotating'
+---@field bearingType? number @ one of 'Fixed'-0 or 'Rotating'-1
 ---@field relativeTo? string @ guid of unit ON THE SAME SIDE that this reference point is relative to or 'none' to clear it.
 ---@field bearing?  number @ the bearing to set if relativeto is set to to fixed.
 ---@field distance? number @ the distance to try to keep from the relative to unit if bearingType is used.
@@ -866,7 +866,6 @@ function CMO__Unit:getUnitMountMagazine(mountguid) end
 function CMO__Unit:inArea(area) end
 ---Update the orbit for a satellite by specifying a TLE. See below for a complete usage example.
 ---@param TLE table @ table containing TLE formated data {TLE='tle data here'}.
-
 function CMO__Unit:updateorbit(TLE) end
 ---theSat = ScenEdit_GetUnit({guid='56f830c1-d0e2-430a-985e-0e301cc01eff'})  
 ---theTLE = 'Resurs P1\n1 39186U 13030A 17013.12537468 .00000446 00000-0 16942-4 0 9992\n2 39186 97.3847 79.3911 0015157 247.7411 195.8488 15.31966970198820'  
@@ -2030,7 +2029,7 @@ function ScenEdit_PlaySound(filename,delay) end
 ---Path can be escaped as of build 1147.30 thank god.
 ---@param filename string @The name of the file. Assumed to be in the Video folder
 ---@param fullscreen? boolean @Shown in full screen
----@param delay? integer @Delay to showing video in seconds (game time I think)
+---@param delay? number @Delay to showing video in seconds (game time I think)
 ---@return string|nil @ string "" on success, "N" on fail, nil on exception error.
 ---Example: ScenEdit_PlayVideo("Tpau-HheartAndSoul.mp4",false,5); 
 function ScenEdit_PlayVideo(filename,fullscreen,delay) end
@@ -2254,7 +2253,7 @@ function ScenEdit_SetEventTrigger(EventDescriptionOrID,CMO__EventTCAUpdate) end
 ---Key names must conform to xml element character restrictions, basically keep it alphanumeric plus it must start with a letter,
 ---can not start with XML or xml, no spaces, generally don't use special chars, but underscore(_) dash(-) and period(.) maybe used.
 ---@param keyname string @ The keyname to set the associated value to.
----@param value string|number @ The string value to save to the key.
+---@param value string|number @ The string/number value to save to the key.
 ---@param forCampaign? boolean @Set the store being passed to next scenario in campaign. Optional, default = false
 ---@return string @ "saved" if successful otherwise a nil, there is almost no way this could fail short of maybe using invalid keyname;
 ---Example: ScenEdit_SetKeyValue("MyKeyName_A",2) --now save the file and reload it then run...  
