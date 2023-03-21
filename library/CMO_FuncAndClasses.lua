@@ -339,6 +339,26 @@ function CMO__Contact:inArea(area) end
 ---@alias CMO__TableOfContacts table<integer,CMO__Contact> @ a table of CMO Contact wrappers.
 
 
+---@class CMO__ConfigTable:table @
+---@field UseEmissionInterval  number Use 0 to turn off or 1 to turn on the Intermittent Emission
+---@field EmissionDuration  number Emission duration in seconds
+---@field EmissionInterval  number Emission interval in seconds
+---@field EmissionIntervalVariation  number Emission variation in seconds
+---@field SleepModeDelay  number Time to sleep in seconds
+---@field FollowWRAforWakeBehavior  number Use 0 to turn off or 1 to turn on to follow WRA behavior (UI ???)
+---@field WakeWhenDetectingThreat  number Use 0 to turn off or 1 to turn on wake up on detecting threat
+---@field WakeID_UNKNOWN  number Use 0 to turn off or 1 to turn on wake if unknown on detection
+---@field WwkeID_PRECISEID  number Use 0 to turn off or 1 to turn on if precice ID
+---@field WakeID_KNWONTYPE  number Use 0 to turn off or 1 to turn on if known type
+---@field WakeIDKNOWNDOMAIN  number Use 0 to turn off or 1 to turn on if known domain
+---@field WakeIDKNOWNCLASS  number Use 0 to turn off or 1 to turn on if known class
+---@field WakeStance_FRIENDLY  number Use 0 to turn off or 1 to turn on if friendly
+---@field WakeStance_HOSTILE  number Use 0 to turn off or 1 to turn on if hostile
+---@field WakeStance_NEUTRAL  number Use 0 to turn off or 1 to turn on if neutral
+---@field WakeStance_UNFRIENDLY  number Use 0 to turn off or 1 to turn on if unfriendly
+---@field WakeStance_UNKNOWN  number Use 0 to turn off or 1 to turn on if unknown stance
+
+
 
 ---@class CMO__Group:table @ GroupWrapper.
 ---@field type string @Type of group. READ ONLY 'AirGroup'=0,'SurfaceGroup','SubGroup',	'Installation', 'MobileGroup', 'AirBase', 'NavalBase'=6.
@@ -2192,7 +2212,12 @@ function ScenEdit_SetDoctrineWRA(CMO__DoctrineWRASelector,CMO__WRA) end
 ---local retval = ScenEdit_SetEMCON('Unit','Camel 2','OECM=Active');
 function ScenEdit_SetEMCON(objType,name,emcon) end
 
-
+---The function's purpose is to configure the specified Alert Level for Intermittent Emissions. There are several Alert levels availbale under the Intermittent Emissions view, and each one can have a different configuration. 
+---@param AUNameOrID string @ name or guid of the unit
+---@param PresetAlertID string @ Green, blue, yellow, orange, red, custom, all
+---@param ConfigurationTable CMO__ConfigTable
+---@return boolean @ True/false if sucessful
+function ScenEdit_SetUnitIntermittentEmissionConfig(AUNameOrID, PresetAlertID, ConfigurationTable) end
 ---Used to create, update details of and event or remove an Event.  
 ---@param EventDescriptionOrID string @ the name or guid of the event to create,update or remove.
 ---@param EventUpdateOptions CMO__EventUpdate @ the table of EventUpdate options.
