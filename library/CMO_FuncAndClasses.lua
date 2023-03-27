@@ -741,7 +741,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field outofcomms? boolean @ true to enable, false to disable.
 ---@field holdposition? boolean @ pause units location?
 ---@field holdfire? boolean @  when set to true sets the 4 main targeting doctrines to hold, when setting to false I believe it reverts them to tight.
----@field proficiency? string @ The unit proficiency, "Novice"|0, "Cadet"|1,"Regular"|2, "Veteran"|3, "Ace"|4.
+---@field proficiency? string|number @ The unit proficiency, "Novice"|0, "Cadet"|1,"Regular"|2, "Veteran"|3, "Ace"|4.
 ---@field manualThrottle? string @ "Current|Desired|Off" disable manual, or set it to current throttle setting or desired throttle setting, or preset keyword.
 ---@field manualSpeed? string @ "Current|Desired|Off" disable manual, or set it to current speed setting or desired speed setting, or numeric speed.
 ---@field manualAltitude? string @ "Current|Desired|Off" disable manual, or set it to current altitude setting or desired altitude setting, or preset or numeric alt.
@@ -772,7 +772,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field holdposition boolean @ True if the unit should hold.
 ---@field holdfire table @ Doctrine WCS setting for {air,surface,subsurface,land}. READ ONLY
 ---@field heading number @ The unit"'"s heading.
----@field proficiency string @ The unit proficiency, "Novice"|0, "Cadet"|1,"Regular"|2, "Veteran"|3, "Ace"|4.
+---@field proficiency string|number @ The unit proficiency, "Novice"|0, "Cadet"|1,"Regular"|2, "Veteran"|3, "Ace"|4.
 ---@field newname string @ If changing existing unit, the unit"'"s new name .
 ---@field course CMO__TableOfWaypoints @ The unit"'"s course, as a table of waypoints
 ---Fuel type can be found in special var _enumTable_.FuelType
@@ -2218,6 +2218,16 @@ function ScenEdit_SetEMCON(objType,name,emcon) end
 ---@param ConfigurationTable CMO__ConfigTable
 ---@return boolean @ True/false if sucessful
 function ScenEdit_SetUnitIntermittentEmissionConfig(AUNameOrID, PresetAlertID, ConfigurationTable) end
+
+---The function's purpose is to turn off/on the Intermittent Emission for the specified Alert Level 
+---@param AUNameOrID string @ The name or GUID of the unit. As no Side is supplied, the unit name would need to be unique across the scenario.
+---@param PresetAlertID string @ The Alert level: GREEN, BLUE, YELLOW, ORANGE, RED, CUSTOM, ALL
+---@param Switch integer @ Use 0 to turn off the Emission interval, 1 to turn on the Emission interval (USEEMISSIONINTERVAL)
+---@return boolean @ True if successful
+---EX:  ScenEdit_SwitchUnitIntermittentEmission ( 'USS Ulysess', 'Green', 1 ) -- turn on interval for Alert level Green for the unit
+function ScenEdit_SwitchUnitIntermittentEmission(AUNameOrID, PresetAlertID, Switch) end
+
+
 ---Used to create, update details of and event or remove an Event.  
 ---@param EventDescriptionOrID string @ the name or guid of the event to create,update or remove.
 ---@param EventUpdateOptions CMO__EventUpdate @ the table of EventUpdate options.
@@ -2709,3 +2719,13 @@ function VP_GetSides() end
 --- local u = VP_GetUnit({guid=SomeGuidHere});
 function VP_GetUnit(CMO__UnitSelector) end 
 
+--- @param UnitNameOrID string @The unit name or GUID. As no side is specified, GUID is more reliable
+---@param text table @ of multiple string Text to show
+---@param R number The 'Red' component of the color (0-255) to show the text in
+---@param G number The 'Green' component of the color (0-255)
+---@param B number The 'Blue' component of the color (0-255)
+---@param moveUpward? boolean [Optional] Default is True. This will move the text upwards
+---@param fade? boolean [Optional] Default is True. This controls the fading out of the text
+---@param lifeTime? number [Optional] Default is 1 second. This controls how long the text stays visible
+---@param fontSize? number @[Optional] Default is 18. This controls the fonst size of the text 
+function ScenEdit_CreateBarkNotification_Unit_Bulk(UnitNameOrID,text,R,G,B,moveUpward,fade,lifeTime,fontSize) end
