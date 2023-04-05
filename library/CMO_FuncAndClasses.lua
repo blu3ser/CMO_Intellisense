@@ -415,6 +415,12 @@ function CMO__Side:getnonavzone(ZoneIdentifier) end
 ---local u = side:side:unitsBy('Ship') -- all ships  
 ---u = side:unitsBy('Ship', 2002, 3003) -- ships fitered for 'Surface combatant' and 'BBC'
 function CMO__Side:unitsBy(UnitType,Category,Subtype) end
+
+---comment
+---@param ZoneIdentifier string @Guid identifier of the zone to retrieve
+---@return table @A table with the RP names of the zone
+function CMO__Side:getstandardzone(ZoneIdentifier) end
+
 ---Method returns table of current contacts filtered by type of unit or nil
 ---@param UnitType string @Type of the unit to filer on ('Aircraft','Submarine','Ship',etc..).
 ---@return table |nil @Returns a numerical indexed table of units {name, guid} or nil on no match.
