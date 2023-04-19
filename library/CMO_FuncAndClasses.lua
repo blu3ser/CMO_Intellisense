@@ -64,7 +64,7 @@ CMO version at time: 1.03.1147.35
 ---@field mount_guid? string @ The mount GUID if working with a mount
 ---@field mag_guid? string @ The guid of the magazine if working with a mag.
 ---@field max_cap? integer @ the max to apply to the added weapon record (only when dealing with a mag - nonfunctional for mounts.)
----@field wpn_dbid string @ The weapon database ID
+---@field wpn_dbid string|number @ The weapon database ID
 ---@field number number @ Number to add
 ---@field remove? boolean @ If true, this will debuct the number of weapons
 ---@field fillout? boolean @ If true, will fill out the weapon record to its maximum
@@ -2735,3 +2735,14 @@ function VP_GetUnit(CMO__UnitSelector) end
 ---@param lifeTime? number [Optional] Default is 1 second. This controls how long the text stays visible
 ---@param fontSize? number @[Optional] Default is 18. This controls the fonst size of the text 
 function ScenEdit_CreateBarkNotification_Unit_Bulk(UnitNameOrID,text,R,G,B,moveUpward,fade,lifeTime,fontSize) end
+
+--- @param UnitNameOrID string @The unit name or GUID. As no side is specified, GUID is more reliable
+---@param text string @ Text to show
+---@param R number The 'Red' component of the color (0-255) to show the text in
+---@param G number The 'Green' component of the color (0-255)
+---@param B number The 'Blue' component of the color (0-255)
+---@param moveUpward? boolean [Optional] Default is True. This will move the text upwards
+---@param fade? boolean [Optional] Default is True. This controls the fading out of the text
+---@param lifeTime? number [Optional] Default is 1 second. This controls how long the text stays visible
+---@param fontSize? number @[Optional] Default is 18. This controls the fonst size of the text 
+function ScenEdit_CreateBarkNotification_Unit(UnitNameOrID,text,R,G,B,moveUpward,fade,lifeTime,fontSize) end
