@@ -89,7 +89,7 @@ CMO version at time: 1.03.1147.35
 ---@field warheadType table @ table of warhead type codes [enum]=stringname
 ---Method to return a table, parameter Can but one of 'fuelstate'|'weaponstate'|'rechargebattery'|'wratargettype'
 
----@type CMO__Enum_Table
+---@class CMO__Enum_Table
 local CMO__Enum_Table = {}
 ---@param name string @ the name of doctrine
 ---@return table|nil @ returns table <integer-enumvalue,string-value>
@@ -131,8 +131,8 @@ function CMO__Enum_Table:Doctrine(name)end
 ---@field Longitude number @ lon in decimal format
 
 ---@class CMO__Location:table @ latitude and longitude entry.
----@field latitude number @ lat in decimal format
----@field longitude number @ lon in decimal format
+---@field latitude number|string @ lat in decimal format
+---@field longitude number|string @ lon in decimal format
 ---@alias CMO__TableOfLocations table<integer,CMO__Location>
 
 
@@ -158,8 +158,8 @@ function CMO__Enum_Table:Doctrine(name)end
 ---Either name or guid of the side may be used.
 ---@class CMO__SideSelector:table
 ---@field guid string @The GUID of the side to select. Much Preferred if available.
----@field Name string @Depricated - The name of the side to select. (internally converted to side property)
----@field side string @The name of the side to select.
+---@field Name string|nil @Depricated - The name of the side to select. (internally converted to side property)
+---@field side string|nil @The name of the side to select.
 
 
 ---@class CMO__SideOptions:table @ a side options detail table.
@@ -327,6 +327,8 @@ function CMO__Scenario:ResetScore() end
 ---(Note that the starting idex of this table is '0' rather than '1' as normal Lua tables23232)  
 ---@field firedOn table @Table of guids that are firing on this contact.
 ---@type CMO__Contact
+
+---@class CMO_Contact
 local CMO__Contact = {} ----dummy entry to attach funcs
 ---Drops contact from the reporting side
 ---@return boolean|nil 
@@ -398,6 +400,8 @@ function CMO__Contact:inArea(area) end
 ---@field expenditures table @Table of expenditure to date - {type, dbid, name, number}.
 ---@field missions table @Table of Mission wrappers for missions on the side.
 ---@type CMO__Side
+
+---@class CMO__Side
 local CMO__Side = {} ----dummy entry to attach funcs
 ---Method returns first matching Exclusion-Zone or nil
 ---@param ZoneIdentifier string @ZoneGuid|ZoneName|ZoneDescription of the zone to get.
@@ -782,10 +786,11 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field newname string @ If changing existing unit, the unit"'"s new name .
 ---@field course CMO__TableOfWaypoints @ The unit"'"s course, as a table of waypoints
 ---Fuel type can be found in special var _enumTable_.FuelType
+---@field UseCustomIntermittentEmissionOnly boolean @Activate the custom intermittent emissions 
 ---@field fuel CMO__TableOfFuelStates @ FuelTable A table of fuel types used by unit (aggrogate) by type.  IF EDITING USE THIS or SetUnit() if you need specific tank refueling like a specific drop tank.
 ---@field fuels CMO__TableOfFuelStates @ FuelTable2 A table of fuel tanks used by unit each with an entry for the fuel involved for that tank. THIS IS READONLY
 ---@field mission CMO__Mission @ The unit"'"s assigned mission. Can be changed by setting to the Mission name or guid (calls ScenEdit_AssignUnitToMission).
----@field group CMO__Group @Group @The unit"'"s group. If setting the group, use a text name of an existing group or a new name to create a group. To remove unit from a group, use "none" as the name.
+---@field group string|CMO__Group @Group @The unit"'"s group. If setting the group, use a text name of an existing group or a new name to create a group. To remove unit from a group, use "none" as the name.
 ---@field readytime string @ how long aircraft/ship takes to be ready. "0" or formated in the "0hrs:0mins:0secs" string format - Can also be other oddball string like "ready", or "No","Unavailable" READ ONLY
 ---Set the time in seconds Can use 'TimeToReady_Minutes=' in SetLoadout() to set the ready time in minutes for aircraft and ship/sub.
 ---@field readytime_v number @ how long aircraft/ship takes to be ready in numerical seconds. (Thanks michael!)
@@ -855,6 +860,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field pitch number @ the current pitch of the unit as a floating point number (aircraft or munition).
 ---@field groundspeed number @ the current groundspeed of the unit as a float.
 ---@type CMO__Unit
+
+---@class CMO_Unit
 local CMO__Unit = {} ----dummy entry to attach funcs
 ---Trigger the unit to return to base, or cancel an RTB.
 ---@param bool boolean @  true to trigger it, false to cancel.
@@ -896,7 +903,8 @@ function CMO__Unit:updateorbit(TLE) end
 ---theSat = ScenEdit_GetUnit({guid='56f830c1-d0e2-430a-985e-0e301cc01eff'})  
 ---theTLE = 'Resurs P1\n1 39186U 13030A 17013.12537468 .00000446 00000-0 16942-4 0 9992\n2 39186 97.3847 79.3911 0015157 247.7411 195.8488 15.31966970198820'  
 ---theSat:updateorbit({TLE=theTLE})
-
+---Deletes a unit
+function CMO__Unit:delete() end
 
 ---CMO__ActiveUnitTypeEnum:  
 ---None=0, Aircraft=1,Ship=2,Submarine=3,Facility=4,Aimpoint=5,Weapon=6,Satellite=7
@@ -1281,14 +1289,14 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 
 ---@class CMO__GetPointFromBearing_Params:table
----@field latitude number @ the starting latitude, can use depricated "Lat" as well
----@field longitude number @ the starting longitude, can use depriceated "Lon" as well 
+---@field latitude number|string @ the starting latitude, can use depricated "Lat" as well
+---@field longitude number|string @ the starting longitude, can use depriceated "Lon" as well 
 ---@field bearing number @ the bearing to use, decimal from 0.0-359.99
 ---@field distance number @ the distance to get the point at in nmi.
 
 ---@class CMO__SetUnitDescriptor:table @ field available when creating a unit or using SetUnit.
 ---@field type string @The type of unit (Ship, Submarine|Sub, Aircraft|Air, Facility|Land, Satellite, Weapon)
----@field unitname string @The name of the unit
+---@field name string @The name of the unit
 ---@field side string @The side name or GUID to add unit to
 ---@field dbid number @The database id of the unit
 ---@field latitude? number|string @ Not required if abase is defined
@@ -1397,7 +1405,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field EarliestTime? number @ .netticktime [RandomTime]
 ---@field LatestTime? number @ .netticktime [RandomTime]
 ---@field Interval? number @ enumcode 0-11 if I recall right [RegularTime] see CMO__Constants.EventTimeInterval.
----@field Time? number @ .netticktime [Time]
+---@field Time? string|osdate @ .netticktime [Time]
 ---@field DamagePercent? number @ [UnitDamaged]
 ---@field TargetFilter? CMO__TargetFilter-UnitsInArea @ table of targetfilter options [UnitDamaged, UnitDestroyed, UnitDetected, UnitEmissions, UnitEntersArea, UnitRemainsInArea, UnitBaseStatus]
 ---@field Area? table @ [UnitDetected, UnitEmissions, UnitEntersArea, UnitRemainsInArea]
@@ -2198,6 +2206,7 @@ function ScenEdit_SetDoctrine(CMO__DoctrineSelector,CMO__Doctrine) end
 function ScenEdit_SetDoctrineWRA(CMO__DoctrineWRASelector,CMO__WRA) end
 
 
+
 ---Sets the EMCON of the selected object.  
 ---Select the object by specifying the type and the object's name. 
 ---objType is the type of object to set the EMCON on. It can be one of 4 values:  
@@ -2452,7 +2461,17 @@ function ScenEdit_SetTrigger(CMO__TriggerUpdate) end
 ---ScenEdit_SetUnit({guid="SAMPLE-UNITGUIDHEREX", heading=0, Proficiency="Ace", Launch=true, OutOfComms=true});  
 ---ScenEdit_SetUnit({side="Rockwell", unitname="Watcher #!", fuel={{2001,60000}}, RTB=false});
 function ScenEdit_SetUnit(CMO__UnitUpdate) end
-
+---Sets and Updates a existing unit's properties
+--- This function is also aliased as SE_SetUnit() for convience.
+---@param CMO__UnitUpdate CMO__UnitUpdate @ CMO__UnitUpdate options table containing but the selector and options to edit.
+---@return CMO__Unit  @ Complete unit wrapper for the modified unit
+---@Examples:  
+---ScenEdit_SetUnit({side="United States", unitname="USS Test", lat =5});  
+---ScenEdit_SetUnit({side="United States", unitname="USS Test", lat =5, lon ="N50.20.10"});  
+---ScenEdit_SetUnit({side="United States", unitname="USS Test", newname="USS MAGA"});  
+---ScenEdit_SetUnit({guid="SAMPLE-UNITGUIDHEREX", heading=0, Proficiency="Ace", Launch=true, OutOfComms=true});  
+---ScenEdit_SetUnit({side="Rockwell", unitname="Watcher #!", fuel={{2001,60000}}, RTB=false});
+function SE_SetUnit(CMO__UnitUpdate) end
 
 -- ---Sets and updates an existing units properties.  
 -- ---Short hand alias for ScenEdit_SetUnit(); see that function name for full listing with examples. 
@@ -2746,3 +2765,11 @@ function ScenEdit_CreateBarkNotification_Unit_Bulk(UnitNameOrID,text,R,G,B,moveU
 ---@param lifeTime? number [Optional] Default is 1 second. This controls how long the text stays visible
 ---@param fontSize? number @[Optional] Default is 18. This controls the fonst size of the text 
 function ScenEdit_CreateBarkNotification_Unit(UnitNameOrID,text,R,G,B,moveUpward,fade,lifeTime,fontSize) end
+
+---Save the scen in the folder passed
+---@param path string @The absolute path to the folder
+function Command_SaveScen(path) end
+
+---Set the simulation fidelity
+---@param fidelity number @0.1, 1, 5 
+function ScenEdit_SetSimulationFidelity(fidelity) end
