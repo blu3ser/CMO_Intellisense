@@ -2565,7 +2565,7 @@ function ScenEdit_UnitX() end
 ---Get the Detecting Unit related to a triggered event.  
 --- ...that triggered the current Event .Otherwise,a nil is returned.  
 ---Note that UnitY() can also be used as a shortcut for ScenEdit_UnitY()
----@return CMO__Unit|nil @ a unit wrapper for the detected contact or nil
+---@return table @ a unit wrapper for the detected contact or nil
 ---Example (inside an event action): print(ScenEdit_UnitX().name);
 function ScenEdit_UnitY() end
 
