@@ -157,9 +157,9 @@ function CMO__Enum_Table:Doctrine(name)end
 
 ---Either name or guid of the side may be used.
 ---@class CMO__SideSelector:table
----@field guid string @The GUID of the side to select. Much Preferred if available.
----@field Name string|nil @Depricated - The name of the side to select. (internally converted to side property)
----@field side string|nil @The name of the side to select.
+---@field guid string ?@The GUID of the side to select. Much Preferred if available.
+---@field Name string|nil ?@Depricated - The name of the side to select. (internally converted to side property)
+---@field side string|nil ?@The name of the side to select.
 
 
 ---@class CMO__SideOptions:table @ a side options detail table.
@@ -179,8 +179,8 @@ function CMO__Enum_Table:Doctrine(name)end
 
 
 ---@class CMO__ReferencePointDescriptor:table @ reference point selection getter|setter
----@field side? string The side the reference point is visible to (sidename may also be used in place of side)
----@field name? string @ the name a reference pointname belonging toside [name AND side if possible] or the name you want when Adding.
+---@field side string The side the reference point is visible to (sidename may also be used in place of side)
+---@field name string @ the name a reference pointname belonging toside [name AND side if possible] or the name you want when Adding.
 ---@field guid? string @ if the unique ID of the reference point is known [preferred] or
 ---@field area? table @ table of reference points (name or guid) or table of latitude & longitude locations. When using in AddReferencePoint() can be multiple.
 ---@field newname? string @ 'string' to rename a reference points name too IF using SetReferencePoint() 
@@ -1149,72 +1149,71 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field guid string @The event GUID. READ ONLY
 ---@field description string @The textual name of the event. WRONG this is blank at the root level use details.description.
 ---This is where most the real data about an event is stored and where real data for name guid description are.
----@field details table @The details of the event with tables for triggers/conditions/actions. READ ONLY
----@field isActive boolean @ Indicates if the event is active or not.
----@field isRepeatable boolean @Indicates if the event repeats
----@field isShown boolean @Indicates if the event triggering shows in log
----@field probability string @ The events chance to occur (0-100)
----@field actions table @ a table of zero or more actions associated to the event READ ONLY (ipairs enumerable). Entry format is actionTypeString=CMO__ActionUpdate sub table.
----@field conditions table @ a table of zero or more conditions associated to the event READ ONLY (ipairs enumerable). Entry format is conditionTypeString=CMO__ConditionUpdate sub table.
----@field triggers table @ a table of zero or more triggers associated to the event READ ONLY (ipairs enumerable). Entry format is triggerTypeString=CMO__TriggerUpdate sub table.
+---@field details ? table @The details of the event with tables for triggers/conditions/actions. READ ONLY
+---@field isActive ? boolean @ Indicates if the event is active or not.
+---@field isRepeatable ? boolean @Indicates if the event repeats
+---@field isShown ? boolean @Indicates if the event triggering shows in log
+---@field probability ? string @ The events chance to occur (0-100)
+---@field actions ? table @ a table of zero or more actions associated to the event READ ONLY (ipairs enumerable). Entry format is actionTypeString=CMO__ActionUpdate sub table.
+---@field conditions ? table @ a table of zero or more conditions associated to the event READ ONLY (ipairs enumerable). Entry format is conditionTypeString=CMO__ConditionUpdate sub table.
+---@field triggers ? table @ a table of zero or more triggers associated to the event READ ONLY (ipairs enumerable). Entry format is triggerTypeString=CMO__TriggerUpdate sub table.
 
 
 ---Contains the obtions available when creating,updating or removing and event with ScenEdit_SetEvent()
 ---@class CMO__EventUpdate:table @ A cmo EventUpdate table
----@field name string @The event name - DEPREICATED this is actually just converted to Description, taking more processing time if used.
----@field description string @The event GUID. WRONG this is blank at the root level use details.description.
----@field mode string @ the update mode of 'add','remove' 'update' (defauls to update) 'list' is not available use GetEvent().
----@field isActive boolean @ Indicates if the event is active or not.
----@field isRepeatable boolean @Indicates if the event repeats
----@field isShown boolean @Indicates if the event triggering shows in log
----@field probability string @ The events chance to occur (0-100)
----@field newName string @ changes the description to this new value. why this isnt newDescription is beyond me probably backward compat reasons.
+---@field description? string @The event GUID. WRONG this is blank at the root level use details.description.
+---@field mode? string @ the update mode of 'add','remove' 'update' (defauls to update) 'list' is not available use GetEvent().
+---@field isActive ? boolean @ Indicates if the event is active or not.
+---@field isRepeatable? boolean @Indicates if the event repeats
+---@field isShown? boolean @Indicates if the event triggering shows in log
+---@field probability? string @ The events chance to occur (0-100)
+---@field newName? string @ changes the description to this new value. why this isnt newDescription is beyond me probably backward compat reasons.
 
 ---Doctrine options you get back|set via GetDoctrine() SetDoctrine().   
 ---For each field, there is an added version with the suffix "_player_editable", of type boolean which determines if the player can alter the setting.  
 ---Not applicable to the Withdraw/Deploy options.  
 ---When setting the option, the indicated value or it's enum number can usually be used.
 ---@class CMO__Doctrine:table @
----@field use_nuclear_weapons boolean @True if the unit should be able to employ nuclear weapons
----@field engage_non_hostile_targets boolean @True if the unit should attempt hostile action against units that are not hostile
----@field rtb_when_winchester boolean @(obsolete, see the new doctrine options) True if the unit should return to base when out of weapons
----@field ignore_plotted_course boolean @True if the unit should ignore plotted course
----@field engaging_ambiguous_targets string @Ignore(0), Optimistic(1), or Pessimistic(2)
----@field automatic_evasion boolean @True if the unit should automatically evade
----@field maintain_standoff boolean @True if the unit should try to avoid approaching its target, only valid for ships
----@field use_refuel_unrep string @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
----@field engage_opportunity_targets boolean @True if the unit should take opportunistic shots
----@field use_sams_in_anti_surface_mode boolean @True if SAMs should be used to engage surface targets
----@field ignore_emcon_while_under_attack boolean @True if EMCON should be ignored and all systems should go active when engaged
----@field quick_turnaround_for_aircraft string @Yes(0), FightersAndASW(1), No(2)
----@field air_operations_tempo string @Surge(0), Sustained(1)
----@field kinematic_range_for_torpedoes string @AutomaticAndManualFire(0), ManualFireOnly(1), No(2)
----@field weapon_control_status_air string|integer @Free(0), Tight(1), Hold(2)
----@field weapon_control_status_surface string|integer @Free(0), Tight(1), Hold(2)
----@field weapon_control_status_subsurface string|integer @Free(0), Tight(1), Hold(2)
----@field weapon_control_status_land string|integer @Free(0), Tight(1), Hold(2)
----@field refuel_unrep_allied string @Yes(0), Yes_ReceiveOnly(1), Yes_DeliverOnly(2), No(3)
----@field fuel_state_planned string|integer @ CMO__Constants.WRAFuelState See _enumTable_:Doctrine("fuelstate"), Bingo(0), Joker10Percent(1), Joker20Percent(2), Joker25Percent(3), Joker30Percent(4), Joker40Percent(5), Joker50Percent(6), Joker60Percent(7), Joker70Percent(8), Joker75Percent(9), Joker80Percent(10), Joker90Percent(11)
----@field fuel_state_rtb string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
----@field weapon_state_planned string|integer @ CMO__Constants.WRAWeaponState @See _enumTable_:Doctrine("weaponstate")
----@field weapon_state_rtb string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
----@field gun_strafing string @No(0), Yes(1)
----@field jettison_ordnance string @No(0), Yes(1)
----@field avoid_contact string @No(0), Yes_ExceptSelfDefence(1), Yes_Always(2)
----@field dive_on_threat string @Yes(0), Yes_ESM_Only(1), Yes_Ships20nm_Aircraft30nm(2), No(3)
----@field recharge_on_patrol string @Recharge_Empty(0), Recharge_10_Percent(10), Recharge_20_Percent(20), Recharge_30_Percent(30), Recharge_40_Percent(40), Recharge_50_Percent(50), Recharge_60_Percent(60), Recharge_70_Percent(70), Recharge_80_Percent(80), Recharge_90_Percent(90)
----@field recharge_on_attack string @Recharge_Empty(0), Recharge_10_Percent(10), Recharge_20_Percent(20), Recharge_30_Percent(30), Recharge_40_Percent(40), Recharge_50_Percent(50), Recharge_60_Percent(60), Recharge_70_Percent(70), Recharge_80_Percent(80), Recharge_90_Percent(90)
----@field use_aip string @No(0), Yes_AttackOnly(1), Yes_Always(2)
----@field dipping_sonar string @Automatically_HoverAnd150ft(0), ManualAndMissionOnly(1)
----@field bvr_logic string @StraightIn(0), Crank(1), Drag(2)
----@field withdraw_on_damage string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
----@field withdraw_on_fuel string @Ignore(0), Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
----@field withdraw_on_attack string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field withdraw_on_defence string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field deploy_on_damage string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
----@field deploy_on_fuel string @Ignore(0) Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
----@field deploy_on_attack string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field deploy_on_defence string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field use_nuclear_weapons ? boolean @True if the unit should be able to employ nuclear weapons
+---@field engage_non_hostile_targets ? boolean @True if the unit should attempt hostile action against units that are not hostile
+---@field rtb_when_winchester ? boolean @(obsolete, see the new doctrine options) True if the unit should return to base when out of weapons
+---@field ignore_plotted_course ? boolean @True if the unit should ignore plotted course
+---@field engaging_ambiguous_targets ? string @Ignore(0), Optimistic(1), or Pessimistic(2)
+---@field automatic_evasion ? boolean @True if the unit should automatically evade
+---@field maintain_standoff ? boolean @True if the unit should try to avoid approaching its target, only valid for ships
+---@field use_refuel_unrep ? string @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
+---@field engage_opportunity_targets ? boolean @True if the unit should take opportunistic shots
+---@field use_sams_in_anti_surface_mode ? boolean @True if SAMs should be used to engage surface targets
+---@field ignore_emcon_while_under_attack ? boolean @True if EMCON should be ignored and all systems should go active when engaged
+---@field quick_turnaround_for_aircraft ? string @Yes(0), FightersAndASW(1), No(2)
+---@field air_operations_tempo ? string @Surge(0), Sustained(1)
+---@field kinematic_range_for_torpedoes ? string @AutomaticAndManualFire(0), ManualFireOnly(1), No(2)
+---@field weapon_control_status_air ? string|integer @Free(0), Tight(1), Hold(2)
+---@field weapon_control_status_surface ? string|integer @Free(0), Tight(1), Hold(2)
+---@field weapon_control_status_subsurface ? string|integer @Free(0), Tight(1), Hold(2)
+---@field weapon_control_status_land ? string|integer @Free(0), Tight(1), Hold(2)
+---@field refuel_unrep_allied ? string @Yes(0), Yes_ReceiveOnly(1), Yes_DeliverOnly(2), No(3)
+---@field fuel_state_planned ? string|integer @ CMO__Constants.WRAFuelState See _enumTable_:Doctrine("fuelstate"), Bingo(0), Joker10Percent(1), Joker20Percent(2), Joker25Percent(3), Joker30Percent(4), Joker40Percent(5), Joker50Percent(6), Joker60Percent(7), Joker70Percent(8), Joker75Percent(9), Joker80Percent(10), Joker90Percent(11)
+---@field fuel_state_rtb ? string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
+---@field weapon_state_planned ? string|integer @ CMO__Constants.WRAWeaponState @See _enumTable_:Doctrine("weaponstate")
+---@field weapon_state_rtb ? string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
+---@field gun_strafing ? string @No(0), Yes(1)
+---@field jettison_ordnance ? string @No(0), Yes(1)
+---@field avoid_contact ? string @No(0), Yes_ExceptSelfDefence(1), Yes_Always(2)
+---@field dive_on_threat ? string @Yes(0), Yes_ESM_Only(1), Yes_Ships20nm_Aircraft30nm(2), No(3)
+---@field recharge_on_patrol ? string @Recharge_Empty(0), Recharge_10_Percent(10), Recharge_20_Percent(20), Recharge_30_Percent(30), Recharge_40_Percent(40), Recharge_50_Percent(50), Recharge_60_Percent(60), Recharge_70_Percent(70), Recharge_80_Percent(80), Recharge_90_Percent(90)
+---@field recharge_on_attack ? string @Recharge_Empty(0), Recharge_10_Percent(10), Recharge_20_Percent(20), Recharge_30_Percent(30), Recharge_40_Percent(40), Recharge_50_Percent(50), Recharge_60_Percent(60), Recharge_70_Percent(70), Recharge_80_Percent(80), Recharge_90_Percent(90)
+---@field use_aip ? string @No(0), Yes_AttackOnly(1), Yes_Always(2)
+---@field dipping_sonar ? string @Automatically_HoverAnd150ft(0), ManualAndMissionOnly(1)
+---@field bvr_logic ? string @StraightIn(0), Crank(1), Drag(2)
+---@field withdraw_on_damage ? string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
+---@field withdraw_on_fuel ? string @Ignore(0), Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
+---@field withdraw_on_attack ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field withdraw_on_defence ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field deploy_on_damage ? string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
+---@field deploy_on_fuel ? string @Ignore(0) Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
+---@field deploy_on_attack ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field deploy_on_defence ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
 
 ---A WRA Doctrine entry. Obtained\set via GetDoctrineWRA(selector) | SetDoctrineWRA(selector,WRA)
 ---When getting if .WRA is nil then it's using inherited options.  
