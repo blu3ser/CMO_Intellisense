@@ -990,13 +990,13 @@ function CMO__Unit:delete() end
 ---@class CMO__LoadoutInfo:table @ A CMO Loadout information table used both in querying and setting loadout related or aircraft status data.
 ---@field UnitName string @The name/GUID of the unit to change the loadout on
 ---@field LoadoutID number @The ID of the new loadout; 0 = use the current loadout <-- use that when just adjusting other entries like TTR.
----@field TimeToReady_Minutes? number @How many minutes until the loadout is ready (default = database loadout time) (_optional_)
----@field IgnoreMagazines? boolean @If the new loadout should rely on the magazines having the right weapons ready (default = false) (_optional_)
----@field ExcludeOptionalWeapons? boolean @Exclude optional weapons from loadout (default = false) (_optional_)
----@field Wpn_DBID? number @Weapon DB number - required if WPN_GUID is not supplied
----@field Wpn_GUID? string @Actual weapon entry to update - DBID is not required as this take precedence (_optional_) You can obtain this via scanning the mounts.
----@field Number number @Number to change current weapon load by (sign ignored)
----@field Remove boolean @Deduct 'number' rather than add.
+---@field TimeToReady_Minutes ? number @How many minutes until the loadout is ready (default = database loadout time) (_optional_)
+---@field IgnoreMagazines ? boolean @If the new loadout should rely on the magazines having the right weapons ready (default = false) (_optional_)
+---@field ExcludeOptionalWeapons ? boolean @Exclude optional weapons from loadout (default = false) (_optional_)
+---@field Wpn_DBID ? number @Weapon DB number - required if WPN_GUID is not supplied
+---@field Wpn_GUID ? string @Actual weapon entry to update - DBID is not required as this take precedence (_optional_) You can obtain this via scanning the mounts.
+---@field Number ? number @Number to change current weapon load by (sign ignored)
+---@field Remove ? boolean @Deduct 'number' rather than add.
 
 ---@class CMO__Loadout:table @ table of information about a loadout - returned by ScenEdit_GetLoadout()
 ---@field dbid integer @ ID from database
