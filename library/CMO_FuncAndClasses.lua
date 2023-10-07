@@ -342,23 +342,23 @@ function CMO__Contact:inArea(area) end
 
 
 ---@class CMO__ConfigTable:table @
----@field UseEmissionInterval  number Use 0 to turn off or 1 to turn on the Intermittent Emission
----@field EmissionDuration  number Emission duration in seconds
----@field EmissionInterval  number Emission interval in seconds
----@field EmissionIntervalVariation  number Emission variation in seconds
----@field SleepModeDelay  number Time to sleep in seconds
----@field FollowWRAforWakeBehavior  number Use 0 to turn off or 1 to turn on to follow WRA behavior (UI ???)
----@field WakeWhenDetectingThreat  number Use 0 to turn off or 1 to turn on wake up on detecting threat
----@field WakeID_UNKNOWN  number Use 0 to turn off or 1 to turn on wake if unknown on detection
----@field WwkeID_PRECISEID  number Use 0 to turn off or 1 to turn on if precice ID
----@field WakeID_KNWONTYPE  number Use 0 to turn off or 1 to turn on if known type
----@field WakeIDKNOWNDOMAIN  number Use 0 to turn off or 1 to turn on if known domain
----@field WakeIDKNOWNCLASS  number Use 0 to turn off or 1 to turn on if known class
----@field WakeStance_FRIENDLY  number Use 0 to turn off or 1 to turn on if friendly
----@field WakeStance_HOSTILE  number Use 0 to turn off or 1 to turn on if hostile
----@field WakeStance_NEUTRAL  number Use 0 to turn off or 1 to turn on if neutral
----@field WakeStance_UNFRIENDLY  number Use 0 to turn off or 1 to turn on if unfriendly
----@field WakeStance_UNKNOWN  number Use 0 to turn off or 1 to turn on if unknown stance
+---@field UseEmissionInterval  ? number Use 0 to turn off or 1 to turn on the Intermittent Emission
+---@field EmissionDuration ? number Emission duration in seconds
+---@field EmissionInterval ? number Emission interval in seconds
+---@field EmissionIntervalVariation ? number Emission variation in seconds
+---@field SleepModeDelay ? number Time to sleep in seconds
+---@field FollowWRAforWakeBehavior ? number Use 0 to turn off or 1 to turn on to follow WRA behavior (UI ???)
+---@field WakeWhenDetectingThreat ? number Use 0 to turn off or 1 to turn on wake up on detecting threat
+---@field WakeID_UNKNOWN ? number Use 0 to turn off or 1 to turn on wake if unknown on detection
+---@field WwkeID_PRECISEID  ? number Use 0 to turn off or 1 to turn on if precice ID
+---@field WakeID_KNWONTYPE ? number Use 0 to turn off or 1 to turn on if known type
+---@field WakeIDKNOWNDOMAIN ? number Use 0 to turn off or 1 to turn on if known domain
+---@field WakeIDKNOWNCLASS ? number Use 0 to turn off or 1 to turn on if known class
+---@field WakeStance_FRIENDLY ? number Use 0 to turn off or 1 to turn on if friendly
+---@field WakeStance_HOSTILE ? number Use 0 to turn off or 1 to turn on if hostile
+---@field WakeStance_NEUTRAL ? number Use 0 to turn off or 1 to turn on if neutral
+---@field WakeStance_UNFRIENDLY ? number Use 0 to turn off or 1 to turn on if unfriendly
+---@field WakeStance_UNKNOWN ? number Use 0 to turn off or 1 to turn on if unknown stance
 
 
 
