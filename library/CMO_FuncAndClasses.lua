@@ -459,16 +459,16 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 
 
 ---@class CMO__Mission:table @MissionWrapper
----@field guid string @The GUID of the mission. READ ONLY
----@field name string @Name of mission.
----@field isactive boolean @True if mission is currently active.
----@field side string @The side the Mission belongs to.
----@field starttime string|osdate @ DateTime Time mission starts.
----@field endtime string|osdate @DateTime Time mission ends.
----@field type string @MissionClass Mission class(patrol,strike,etc). READ ONLY
----@field subtype string @MissionSubClass Mission class(asw,land,etc). READ ONLY
----@field SISH boolean @'Scrub if side human' tick box
----@field unitlist table @ A table of units assigned to mission containing GUIDs of the units . READ ONLY
+---@field guid ? string @The GUID of the mission. READ ONLY
+---@field name ? string @Name of mission.
+---@field isactive ? boolean @True if mission is currently active.
+---@field side ? string @The side the Mission belongs to.
+---@field starttime ? string|osdate @ DateTime Time mission starts.
+---@field endtime ? string|osdate @DateTime Time mission ends.
+---@field type ? string @MissionClass Mission class(patrol,strike,etc). READ ONLY
+---@field subtype ? string @MissionSubClass Mission class(asw,land,etc). READ ONLY
+---@field SISH ? boolean @'Scrub if side human' tick box
+---@field unitlist ? table @ A table of units assigned to mission containing GUIDs of the units . READ ONLY
 ---@field targetlist? table @ A table of targets assigned to mission containing GUIDs of the contacts or units. READ ONLY
 ---@field aar? CMO__Mission_AAR @ A table of the mission air-to-air refueling options. READ ONLY
 ---@field ferrymission? table @ FerryMission A table of the mission specific options. READ ONLY
