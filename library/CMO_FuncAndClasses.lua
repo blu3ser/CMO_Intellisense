@@ -12,7 +12,7 @@
 lastupdated: 11/13/2021
 sumneko version at time: 2.4.0 (2.4.7 available but untested)
 vscode version at time: 1.59
-CMO version at time: 1.03.1147.35
+CMO version at time: 1.05.1309.10
 --]]
 
 ---@meta
