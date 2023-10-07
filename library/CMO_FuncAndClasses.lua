@@ -12,7 +12,7 @@
 lastupdated: 11/13/2021
 sumneko version at time: 2.4.0 (2.4.7 available but untested)
 vscode version at time: 1.59
-CMO version at time: 1.03.1147.35
+CMO version at time: 1.05.1309.10
 --]]
 
 ---@meta
@@ -1282,7 +1282,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 ---@class CMO__SetUnitDescriptor:table @ field available when creating a unit or using SetUnit.
 ---@field type string @The type of unit (Ship, Submarine|Sub, Aircraft|Air, Facility|Land, Satellite, Weapon)
----@field unitname string @The name of the unit
+---@field name string @The name of the unit
 ---@field side string @The side name or GUID to add unit to
 ---@field dbid number @The database id of the unit
 ---@field latitude? number|string @ Not required if abase is defined
