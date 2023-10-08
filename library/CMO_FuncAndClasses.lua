@@ -180,7 +180,7 @@ function CMO__Enum_Table:Doctrine(name)end
 
 ---@class CMO__ReferencePointDescriptor:table @ reference point selection getter|setter
 ---@field side string The side the reference point is visible to (sidename may also be used in place of side)
----@field name string @ the name a reference pointname belonging toside [name AND side if possible] or the name you want when Adding.
+---@field name ? string @ the name a reference pointname belonging toside [name AND side if possible] or the name you want when Adding.
 ---@field guid? string @ if the unique ID of the reference point is known [preferred] or
 ---@field area? table @ table of reference points (name or guid) or table of latitude & longitude locations. When using in AddReferencePoint() can be multiple.
 ---@field newname? string @ 'string' to rename a reference points name too IF using SetReferencePoint() 
@@ -1360,8 +1360,9 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 ---Used when creating updating or removing an Action.
 ---@class CMO__ActionUpdate:table
----@field ID string @ The GUID of the action [READONLY]
----@field Description string @ Description or GUID of action (You can actually use 'Name' as well and it will be auto converted to Description.)
+---@field ID ? string @ The guid of the action [READONLY]
+---@field name ? string @ The name of the action 
+---@field Description ? string @ Description or GUID of action (You can actually use 'Name' as well and it will be auto converted to Description.)
 ---@field NewName? string @ If specified, the new name of the action (technically updates 'Description').
 ---@field Mode? string @ Operation to do - 'list', 'add', 'remove', 'update' ('update' is the default if not specified).
 ---@field Type? string @ Type of action string code [required only for 'add' option]  'TeleportInArea|Points|Message|LuaScript|ChangeMissionStatus|EndScenario'
@@ -1377,7 +1378,8 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 ---Used when creating updating or removing a Condition.
 ---@class CMO__ConditionUpdate:table
----@field ID string @ The GUID of the action [READONLY]
+---@field ID ? string @ The GUID of the action [READONLY]
+---@field name  string @ The name of the condition
 ---@field Description string @ Description or GUID of action (You can actually use 'Name' as well and it will be auto converted to Description.)
 ---@field NewName? string @ If specified, the new name of the action (technically updates 'Description').
 ---@field Mode? string @ Operation to do - 'list', 'add', 'remove', 'update' ('update' is the default if not specified).
@@ -1391,8 +1393,9 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 ---Used when creating updating or removing a Trigger.
 ---@class CMO__TriggerUpdate:table
----@field ID string @ The GUID of the action [READONLY]
----@field Description string @ Description or GUID of action (You can actually use 'Name' as well and it will be auto converted to Description.)
+---@field ID ? string @ The GUID of the action [READONLY]
+---@field name ? string @ The name of the trigger
+---@field Description ? string @ Description or GUID of action (You can actually use 'Name' as well and it will be auto converted to Description.)
 ---@field NewName? string @ If specified, the new name of the action (technically updates 'Description').
 ---@field Mode? string @ Operation to do - 'list', 'add', 'remove', 'update' ('update' is the default if not specified).
 ---Type string codes: Points| RandomTime| RegularTime| ScenEnded| ScenLoaded| Time| UnitDamaged| UnitDestroyed| UnitDetected| UnitEmissions|
@@ -1438,7 +1441,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@class CMO__EventTCAUpdate:table @ a table of options for doing a trigger, condition or action update on an Event.
 ---@field guid? string @ the guid of the trigger,condition, or action object involved. can be used instead of description directly (faster).
 ---@field mode? string @ either one of 'add','replace','remove'. (defaults to 'update'- an invalid operation wtf even though there is code to treat it like replace?)
----@field description string @ name or ID (guid by other identifier) of the trigger,condition,or action involved. 
+---@field name string @ name or ID (guid by other identifier) of the trigger,condition,or action involved. 
 ---@field ReplacedBy? string @ name or ID (guid by other identifier) of the trigger,condition,or action replacing the existing one. (undocumented)
 
 
