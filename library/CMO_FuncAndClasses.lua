@@ -2687,7 +2687,7 @@ function Tool_DumpEvents() end
 
 ---Simulates 'Event' environment in the lua console and in special events.  
 ---Off by default. Set to true to enable and false to disable.
----@param thevalue boolean @ true or false
+---@param thevalue ? boolean @ Default true, 
 ---@return boolean @ the current value of the setting (if interactive);
 function Tool_EmulateNoConsole(thevalue) end
 
