@@ -7,7 +7,7 @@ CMO Build: 1.03 1147.30
     BEGIN CONSTANTS
 --]]
 
----@type CMO__Constants:table
+---@class CMO__Constants:table
 CMO__Constants = {};
 ---see print(_enumTable_:Doctrine("wratargettype"));
 
