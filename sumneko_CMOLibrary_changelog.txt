@@ -1,6 +1,12 @@
 CMO Objects Function Constants Changelog 
 -----------------------------------------
-
+08/10/2023 (CMO v1.06 1328.9) - Blu3s
+-----------
++unit number as type to fields like altitude/longitude/dbids etc
++add ? to fields not needed for functions
++added intermitent emissions
++add standardzone method
++unitY returns a table
 
 11-13-2021 (CMO Builds 1147.31 through 1147.35) 
 ----
