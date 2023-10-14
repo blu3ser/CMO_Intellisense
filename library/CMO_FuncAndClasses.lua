@@ -2767,7 +2767,18 @@ function ScenEdit_CreateBarkNotification_Unit_Bulk(UnitNameOrID,text,R,G,B,moveU
 ---@param lifeTime? number [Optional] Default is 1 second. This controls how long the text stays visible
 ---@param fontSize? number @[Optional] Default is 18. This controls the fonst size of the text 
 function ScenEdit_CreateBarkNotification_Unit(UnitNameOrID,text,R,G,B,moveUpward,fade,lifeTime,fontSize) end
-
+---comment
+---@param latitude number
+---@param longitude number 
+---@param text string @ Text to show
+---@param R number The 'Red' component of the color (0-255) to show the text in
+---@param G number The 'Green' component of the color (0-255)
+---@param B number The 'Blue' component of the color (0-255)
+---@param moveUpward? boolean [Optional] Default is True. This will move the text upwards
+---@param fade? boolean [Optional] Default is True. This controls the fading out of the text
+---@param lifeTime? number [Optional] Default is 1 second. This controls how long the text stays visible
+---@param fontSize? number @[Optional] Default is 18. This controls the fonst size of the text 
+function ScenEdit_CreateBarkNotification_Geo(latitude,longitude,text,R,G,B,moveUpward,fade,lifeTime,fontSize) end
 ---Save the scen in the folder passed
 ---@param path string @The absolute path to the folder
 function Command_SaveScen(path) end
