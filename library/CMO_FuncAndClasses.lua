@@ -59,7 +59,7 @@ CMO version at time: 1.05.1309.10
 
 ---@class CMO__Weapon2MountDescriptor:table @ for use with AddReloadsToUnit() AddWeaponToUnitMagazine()
 ---@field side string @ The side name/GUID of the unit with mount
----@field unitname string @ The name/GUID of unit with mount
+---@field unitname? string @ The name/GUID of unit with mount
 ---@field guid string @ GUID of the unit with mount
 ---@field mount_guid? string @ The mount GUID if working with a mount
 ---@field mag_guid? string @ The guid of the magazine if working with a mag.
@@ -858,6 +858,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field jammed boolean @ true if the unit is flagged as being jammed. (Thanks michael!)
 ---@field jammer boolean @ true if the unit is flagged as emitting jamming signals. 
 ---@field pitch number @ the current pitch of the unit as a floating point number (aircraft or munition).
+---@field roll number @The unit roll as a floating point number (aircraft)
 ---@field groundspeed number @ the current groundspeed of the unit as a float.
 ---@type CMO__Unit
 
@@ -2786,3 +2787,10 @@ function Command_SaveScen(path) end
 ---Set the simulation fidelity
 ---@param fidelity number @0.1, 1, 5 
 function ScenEdit_SetSimulationFidelity(fidelity) end
+
+---comment
+---@param title string The title that shows on the top of the dialog box 
+---@param form string A HTML form from which data can be entered, The current input supported modes are text, select, and radio. 
+---@param interactions table One of more Button names 
+---@return table Table of form_name = value
+function UI_CallAdvancedHTMLDialog ( title, form, interactions ) end
