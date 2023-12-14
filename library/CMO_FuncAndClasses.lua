@@ -478,7 +478,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field patrolmission? table @ PatrolMission A table of the mission specific options. READ ONLY
 ---@field strikemission? table @ StrikeMission A table of the mission specific options. READ ONLY
 ---@field cargomission? table @ CargoMission A table of the mission specific options. READ ONLY
-
+---@field TakeOffTime? osdate @ os.date() format for the take off time
+---@field TimeOnTargetStation? osdate @ os.date() format for the time on target or station
 
 ---@class CMO__Mission_AAR:table @MissionAAR table
 ---@field Doctrine_UseReplenishment? string @ When 'getting' this is string value of use_refuel_unrep (undocumented).
@@ -763,6 +764,9 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field TimeToReady_Minutes? number @ number of minutes till the unit is ready if on the ground.  (this could be set via SetLoadout as well.)
 
 
+---@class CMO__LoadoutAvailable:table @LoadoutAvailable
+---@field LoadoutDBID number @Number of loadout
+---@field Available boolean @If the loadout is available or not
 
 ---@class CMO__Unit:table @UnitWrapper
 ---@field type string @ The type of object, may be of type in _enumTable_.UnitType or 'Group' .READ ONLY
@@ -990,7 +994,7 @@ function CMO__Unit:delete() end
 
 ---@class CMO__LoadoutInfo:table @ A CMO Loadout information table used both in querying and setting loadout related or aircraft status data.
 ---@field UnitName string @The name/GUID of the unit to change the loadout on
----@field LoadoutID number @The ID of the new loadout; 0 = use the current loadout <-- use that when just adjusting other entries like TTR.
+---@field LoadoutID number ? @The ID of the new loadout; 0 = use the current loadout <-- use that when just adjusting other entries like TTR.
 ---@field TimeToReady_Minutes ? number @How many minutes until the loadout is ready (default = database loadout time) (_optional_)
 ---@field IgnoreMagazines ? boolean @If the new loadout should rely on the magazines having the right weapons ready (default = false) (_optional_)
 ---@field ExcludeOptionalWeapons ? boolean @Exclude optional weapons from loadout (default = false) (_optional_)
@@ -1553,6 +1557,9 @@ function ScenEdit_AddSpecialAction(CMO__SpecialActionUpdate) end
 ---ScenEdit_AddUnit({side ='NATO', type ='Ship', name ='USS KH', heading=90, dbid=341, Latitude=1.0,Longitude=1.0, holdfire=true,proficiency=5,speed=12})
 function ScenEdit_AddUnit(CMO__SetUnitDescriptor) end
 
+---comment
+---@param CMO__LoadoutAvailable CMO__LoadoutAvailable any
+function ScenEdit_SetLoadoutAvailable(CMO__LoadoutAvailable) end
 
 --- DEPRICATED: Use ScenEdit_AddUnit type='Ship' instead.
 ---@deprecated
