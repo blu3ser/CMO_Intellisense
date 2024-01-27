@@ -2787,7 +2787,7 @@ function Command_SaveScen(path) end
 ---@param fidelity number @0.1, 1, 5 
 function ScenEdit_SetSimulationFidelity(fidelity) end
 
----Creates an HTML form
+---Creates a window with an HTML message to allow input data from a custom HTML Form. See https://commandlua.github.io/assets/Function_UI_CallAdvancedHTMLDialog.html
 ---@param title string @Title of the document
 ---@param html_message string @HTML message to display
 ---@param buttons table @Buttons to display and interact
