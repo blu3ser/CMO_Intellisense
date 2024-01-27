@@ -2786,3 +2786,10 @@ function Command_SaveScen(path) end
 ---Set the simulation fidelity
 ---@param fidelity number @0.1, 1, 5 
 function ScenEdit_SetSimulationFidelity(fidelity) end
+
+---Creates an HTML form
+---@param title string @Title of the document
+---@param html_message string @HTML message to display
+---@param buttons table @Buttons to display and interact
+---@return table @Table with all the items from the HTML form and button pressed in key 'pressed'
+function UI_CallAdvancedHTMLDialog(title, html_message, buttons) end
