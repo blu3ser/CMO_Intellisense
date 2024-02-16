@@ -2557,6 +2557,13 @@ function ScenEdit_TransferCargo(fromUnit,toUnit,cargoList) end
 ---Example (inside an event action): print(ScenEdit_UnitC().name);
 function ScenEdit_UnitC() end
 
+---Gets the Detected Contact Wrapper related to an triggered event.  
+--- ...from a Unit Detected event trigger. Otherwise, a nil is returned.  
+--- Note that UnitC() can also be used as a shortcut for ScenEdit_UnitC()
+---@return CMO__Contact|nil @ a contact wrapper for the detected contact or nil
+---Example (inside an event action): print(ScenEdit_UnitC().name);
+function UnitC() end
+
 ---Get the Activating Unit related to a triggered event.  
 --- ...that triggered the current Event. Otherwise,a nil is returned.  
 ---Note that UnitX() can also be used as a shortcut for ScenEdit_UnitX()
@@ -2564,12 +2571,26 @@ function ScenEdit_UnitC() end
 ---Example (inside an event action): print(ScenEdit_UnitX().name);
 function ScenEdit_UnitX() end
 
+---Get the Activating Unit related to a triggered event.  
+--- ...that triggered the current Event. Otherwise,a nil is returned.  
+---Note that UnitX() can also be used as a shortcut for ScenEdit_UnitX()
+---@return CMO__Unit|nil @ a unit wrapper for the detected contact or nil
+---Example (inside an event action): print(ScenEdit_UnitX().name);
+function UnitX() end
+
 ---Get the Detecting Unit related to a triggered event.  
 --- ...that triggered the current Event .Otherwise,a nil is returned.  
 ---Note that UnitY() can also be used as a shortcut for ScenEdit_UnitY()
 ---@return table @ a unit wrapper for the detected contact or nil
 ---Example (inside an event action): print(ScenEdit_UnitX().name);
 function ScenEdit_UnitY() end
+
+---Get the Detecting Unit related to a triggered event.  
+--- ...that triggered the current Event .Otherwise,a nil is returned.  
+---Note that UnitY() can also be used as a shortcut for ScenEdit_UnitY()
+---@return table @ a unit wrapper for the detected contact or nil
+---Example (inside an event action): print(ScenEdit_UnitX().name);
+function UnitY() end
 
 ---Unload cargo  
 ---basically disembark cargo from the unit.
