@@ -2565,6 +2565,13 @@ function ScenEdit_TransferCargo(fromUnit,toUnit,cargoList) end
 ---Example (inside an event action): print(ScenEdit_UnitC().name);
 function ScenEdit_UnitC() end
 
+---Gets the Detected Contact Wrapper related to an triggered event.  
+--- ...from a Unit Detected event trigger. Otherwise, a nil is returned.  
+--- Note that UnitC() can also be used as a shortcut for ScenEdit_UnitC()
+---@return CMO__Contact|nil @ a contact wrapper for the detected contact or nil
+---Example (inside an event action): print(ScenEdit_UnitC().name);
+function UnitC() end
+
 ---Get the Activating Unit related to a triggered event.  
 --- ...that triggered the current Event. Otherwise,a nil is returned.  
 ---Note that UnitX() can also be used as a shortcut for ScenEdit_UnitX()
@@ -2572,12 +2579,26 @@ function ScenEdit_UnitC() end
 ---Example (inside an event action): print(ScenEdit_UnitX().name);
 function ScenEdit_UnitX() end
 
+---Get the Activating Unit related to a triggered event.  
+--- ...that triggered the current Event. Otherwise,a nil is returned.  
+---Note that UnitX() can also be used as a shortcut for ScenEdit_UnitX()
+---@return CMO__Unit|nil @ a unit wrapper for the detected contact or nil
+---Example (inside an event action): print(ScenEdit_UnitX().name);
+function UnitX() end
+
 ---Get the Detecting Unit related to a triggered event.  
 --- ...that triggered the current Event .Otherwise,a nil is returned.  
 ---Note that UnitY() can also be used as a shortcut for ScenEdit_UnitY()
 ---@return table @ a unit wrapper for the detected contact or nil
 ---Example (inside an event action): print(ScenEdit_UnitX().name);
 function ScenEdit_UnitY() end
+
+---Get the Detecting Unit related to a triggered event.  
+--- ...that triggered the current Event .Otherwise,a nil is returned.  
+---Note that UnitY() can also be used as a shortcut for ScenEdit_UnitY()
+---@return table @ a unit wrapper for the detected contact or nil
+---Example (inside an event action): print(ScenEdit_UnitX().name);
+function UnitY() end
 
 ---Unload cargo  
 ---basically disembark cargo from the unit.
@@ -2795,9 +2816,9 @@ function Command_SaveScen(path) end
 ---@param fidelity number @0.1, 1, 5 
 function ScenEdit_SetSimulationFidelity(fidelity) end
 
----comment
----@param title string The title that shows on the top of the dialog box 
----@param form string A HTML form from which data can be entered, The current input supported modes are text, select, and radio. 
----@param interactions table One of more Button names 
----@return table Table of form_name = value
-function UI_CallAdvancedHTMLDialog ( title, form, interactions ) end
+---Creates a window with an HTML message to allow input data from a custom HTML Form. See https://commandlua.github.io/assets/Function_UI_CallAdvancedHTMLDialog.html
+---@param title string @Title of the document
+---@param html_message string @HTML message to display
+---@param buttons table @Buttons to display and interact
+---@return table @Table with all the items from the HTML form and button pressed in key 'pressed'
+function UI_CallAdvancedHTMLDialog(title, html_message, buttons) end
