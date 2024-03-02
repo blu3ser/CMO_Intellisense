@@ -478,8 +478,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field patrolmission? table @ PatrolMission A table of the mission specific options. READ ONLY
 ---@field strikemission? table @ StrikeMission A table of the mission specific options. READ ONLY
 ---@field cargomission? table @ CargoMission A table of the mission specific options. READ ONLY
----@field TakeOffTime? osdate @ os.date() format for the take off time
----@field TimeOnTargetStation? osdate @ os.date() format for the time on target or station
+---@field TakeOffTime? string @ os.date() format for the take off time
+---@field TimeOnTargetStation? string @ os.date() format for the time on target or station
 
 ---@class CMO__Mission_AAR:table @MissionAAR table
 ---@field Doctrine_UseReplenishment? string @ When 'getting' this is string value of use_refuel_unrep (undocumented).
