@@ -58,9 +58,9 @@ CMO version at time: 1.05.1309.10
 
 
 ---@class CMO__Weapon2MountDescriptor:table @ for use with AddReloadsToUnit() AddWeaponToUnitMagazine()
----@field side string @ The side name/GUID of the unit with mount
+---@field side? string @ The side name/GUID of the unit with mount
 ---@field unitname? string @ The name/GUID of unit with mount
----@field guid string @ GUID of the unit with mount
+---@field guid? string @ GUID of the unit with mount
 ---@field mount_guid? string @ The mount GUID if working with a mount
 ---@field mag_guid? string @ The guid of the magazine if working with a mag.
 ---@field max_cap? integer @ the max to apply to the added weapon record (only when dealing with a mag - nonfunctional for mounts.)
@@ -69,7 +69,8 @@ CMO version at time: 1.05.1309.10
 ---@field remove? boolean @ If true, this will debuct the number of weapons
 ---@field fillout? boolean @ If true, will fill out the weapon record to its maximum
 
-
+---@class CMO__TargetInformation:table @Target information for units
+---@field CMO_Contact @ The Contact information of the unit
 ---@class CMO__Enum_Table:table @ definitions for _enumTable_ global taken from .net LuaEnuNames
 ---@field Altitude table @ table of altitude presets [enum]=stringname
 ---@field Condition_Air table @ table of possible conditions for air units. [enum]=stringname
@@ -791,6 +792,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field course CMO__TableOfWaypoints @ The unit"'"s course, as a table of waypoints
 ---Fuel type can be found in special var _enumTable_.FuelType
 ---@field UseCustomIntermittentEmissionOnly boolean @Activate the custom intermittent emissions 
+---@field target CMO__Contact @The unit target. Only for Weapons.
 ---@field fuel CMO__TableOfFuelStates @ FuelTable A table of fuel types used by unit (aggrogate) by type.  IF EDITING USE THIS or SetUnit() if you need specific tank refueling like a specific drop tank.
 ---@field fuels CMO__TableOfFuelStates @ FuelTable2 A table of fuel tanks used by unit each with an entry for the fuel involved for that tank. THIS IS READONLY
 ---@field mission CMO__Mission @ The unit"'"s assigned mission. Can be changed by setting to the Mission name or guid (calls ScenEdit_AssignUnitToMission).
@@ -993,7 +995,7 @@ function CMO__Unit:delete() end
 ---@field altitude number @ Altitude The altitude of the detonation
 
 ---@class CMO__LoadoutInfo:table @ A CMO Loadout information table used both in querying and setting loadout related or aircraft status data.
----@field UnitName string @The name/GUID of the unit to change the loadout on
+---@field unitname string @The name/GUID of the unit to change the loadout on
 ---@field LoadoutID number ? @The ID of the new loadout; 0 = use the current loadout <-- use that when just adjusting other entries like TTR.
 ---@field TimeToReady_Minutes ? number @How many minutes until the loadout is ready (default = database loadout time) (_optional_)
 ---@field IgnoreMagazines ? boolean @If the new loadout should rely on the magazines having the right weapons ready (default = false) (_optional_)
@@ -2111,7 +2113,7 @@ function ScenEdit_RefuelUnit(CMO__RefuelOptions) end
 
 ---Removes all Units, Contacts and weapons from a side.  
 ---Nearly certain this also removes the side itself as well.
----@param side string @ The name or guid of the side to remove.
+---@param side CMO__Side @ The name or guid of the side to remove.
 ---@return CMO__Side|nil @ a copy of side wrapper of the side before it was acted upon, or nil on failure.
 ---Example: local deletedSide = ScenEdit_RemoveSide("Blue");
 function ScenEdit_RemoveSide(side) end
