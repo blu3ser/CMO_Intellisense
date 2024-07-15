@@ -164,11 +164,11 @@ function CMO__Enum_Table:Doctrine(name)end
 
 
 ---@class CMO__SideOptions:table @ a side options detail table.
----@field side string @Side name
----@field guid string @Side guid
----@field awareness string|integer @Side awareness enum code -1 to 3 or keyword string name. (BLIND,NORMAL,AUTOSIDE,AUTOUNIT,OMNI)
----@field proficiency string|integer @Side proficiency enum code 0-4 or keyword string name.
----@field switchto boolean @ Change players game side to side option specified. (only applicable with ScenEdit_SetSideOptions() )
+---@field side string ?@Side name
+---@field guid string ?@Side guid
+---@field awareness string|integer ?@Side awareness enum code -1 to 3 or keyword string name. (BLIND,NORMAL,AUTOSIDE,AUTOUNIT,OMNI)
+---@field proficiency string|integer ?@Side proficiency enum code 0-4 or keyword string name.
+---@field switchto boolean ?@ Change players game side to side option specified. (only applicable with ScenEdit_SetSideOptions() )
 
 
 
@@ -755,8 +755,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field holdfire? boolean @  when set to true sets the 4 main targeting doctrines to hold, when setting to false I believe it reverts them to tight.
 ---@field proficiency? string|number @ The unit proficiency, "Novice"|0, "Cadet"|1,"Regular"|2, "Veteran"|3, "Ace"|4.
 ---@field manualThrottle? string @ "Current|Desired|Off" disable manual, or set it to current throttle setting or desired throttle setting, or preset keyword.
----@field manualSpeed? string @ "Current|Desired|Off" disable manual, or set it to current speed setting or desired speed setting, or numeric speed.
----@field manualAltitude? string @ "Current|Desired|Off" disable manual, or set it to current altitude setting or desired altitude setting, or preset or numeric alt.
+---@field manualSpeed? string|number @ "Current|Desired|Off" disable manual, or set it to current speed setting or desired speed setting, or numeric speed.
+---@field manualAltitude? string|number @ "Current|Desired|Off" disable manual, or set it to current altitude setting or desired altitude setting, or preset or numeric alt.
 ---@field fuel? table @ table of parirs of one or more {fueltypecode,fuelamount} entries.
 ---@field base? string @ name or guid of the base to assign to the unit.
 ---@field sprintDrift? boolean @ true to enable sprint and drift or false to disable.
@@ -2728,6 +2728,10 @@ function Tool_EmulateNoConsole(thevalue) end
 ---@return number @ the horizontal distance in nmi
 function Tool_Range(startLocation,endLocation) end
 
+---Creates a new scenario. Equivalent to Menu File -> Create New Scenario. If not DB is provided it will use the actual DB.
+---@param db string ?@The DB filename to create the new scenario
+function Tool_BuildBlankScenario(db) end
+
 --- completely undocumented. Internal Appears to be related to resetting error conditions or managing in-game LUA editor environment??
 --- hard to follow the what the delegate is actually doing.
 ---@param windowName string @ 
@@ -2824,3 +2828,13 @@ function ScenEdit_SetSimulationFidelity(fidelity) end
 ---@param buttons table @Buttons to display and interact
 ---@return table @Table with all the items from the HTML form and button pressed in key 'pressed'
 function UI_CallAdvancedHTMLDialog(title, html_message, buttons) end
+
+---comment
+---@param text string @Text to print to Exception Log
+function print_exc(text) end
+
+---comment
+---@param Latitude number @Latitude
+---@param Longitude number @Longitude
+---@param Altitude number ?@Altitude of the camera in meters
+function UI_SetCameraView(Latitude, Longitude,Altitude) end
