@@ -58,9 +58,9 @@ CMO version at time: 1.05.1309.10
 
 
 ---@class CMO__Weapon2MountDescriptor:table @ for use with AddReloadsToUnit() AddWeaponToUnitMagazine()
----@field side string @ The side name/GUID of the unit with mount
+---@field side? string @ The side name/GUID of the unit with mount
 ---@field unitname? string @ The name/GUID of unit with mount
----@field guid string @ GUID of the unit with mount
+---@field guid? string @ GUID of the unit with mount
 ---@field mount_guid? string @ The mount GUID if working with a mount
 ---@field mag_guid? string @ The guid of the magazine if working with a mag.
 ---@field max_cap? integer @ the max to apply to the added weapon record (only when dealing with a mag - nonfunctional for mounts.)
@@ -69,7 +69,8 @@ CMO version at time: 1.05.1309.10
 ---@field remove? boolean @ If true, this will debuct the number of weapons
 ---@field fillout? boolean @ If true, will fill out the weapon record to its maximum
 
-
+---@class CMO__TargetInformation:table @Target information for units
+---@field CMO_Contact @ The Contact information of the unit
 ---@class CMO__Enum_Table:table @ definitions for _enumTable_ global taken from .net LuaEnuNames
 ---@field Altitude table @ table of altitude presets [enum]=stringname
 ---@field Condition_Air table @ table of possible conditions for air units. [enum]=stringname
@@ -163,11 +164,11 @@ function CMO__Enum_Table:Doctrine(name)end
 
 
 ---@class CMO__SideOptions:table @ a side options detail table.
----@field side string @Side name
----@field guid string @Side guid
----@field awareness string|integer @Side awareness enum code -1 to 3 or keyword string name. (BLIND,NORMAL,AUTOSIDE,AUTOUNIT,OMNI)
----@field proficiency string|integer @Side proficiency enum code 0-4 or keyword string name.
----@field switchto boolean @ Change players game side to side option specified. (only applicable with ScenEdit_SetSideOptions() )
+---@field side string ?@Side name
+---@field guid string ?@Side guid
+---@field awareness string|integer ?@Side awareness enum code -1 to 3 or keyword string name. (BLIND,NORMAL,AUTOSIDE,AUTOUNIT,OMNI)
+---@field proficiency string|integer ?@Side proficiency enum code 0-4 or keyword string name.
+---@field switchto boolean ?@ Change players game side to side option specified. (only applicable with ScenEdit_SetSideOptions() )
 
 
 
@@ -478,8 +479,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field patrolmission? table @ PatrolMission A table of the mission specific options. READ ONLY
 ---@field strikemission? table @ StrikeMission A table of the mission specific options. READ ONLY
 ---@field cargomission? table @ CargoMission A table of the mission specific options. READ ONLY
----@field TakeOffTime? osdate @ os.date() format for the take off time
----@field TimeOnTargetStation? osdate @ os.date() format for the time on target or station
+---@field TakeOffTime? string @ os.date() format for the take off time
+---@field TimeOnTargetStation? string @ os.date() format for the time on target or station
 
 ---@class CMO__Mission_AAR:table @MissionAAR table
 ---@field Doctrine_UseReplenishment? string @ When 'getting' this is string value of use_refuel_unrep (undocumented).
@@ -754,8 +755,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field holdfire? boolean @  when set to true sets the 4 main targeting doctrines to hold, when setting to false I believe it reverts them to tight.
 ---@field proficiency? string|number @ The unit proficiency, "Novice"|0, "Cadet"|1,"Regular"|2, "Veteran"|3, "Ace"|4.
 ---@field manualThrottle? string @ "Current|Desired|Off" disable manual, or set it to current throttle setting or desired throttle setting, or preset keyword.
----@field manualSpeed? string @ "Current|Desired|Off" disable manual, or set it to current speed setting or desired speed setting, or numeric speed.
----@field manualAltitude? string @ "Current|Desired|Off" disable manual, or set it to current altitude setting or desired altitude setting, or preset or numeric alt.
+---@field manualSpeed? string|number @ "Current|Desired|Off" disable manual, or set it to current speed setting or desired speed setting, or numeric speed.
+---@field manualAltitude? string|number @ "Current|Desired|Off" disable manual, or set it to current altitude setting or desired altitude setting, or preset or numeric alt.
 ---@field fuel? table @ table of parirs of one or more {fueltypecode,fuelamount} entries.
 ---@field base? string @ name or guid of the base to assign to the unit.
 ---@field sprintDrift? boolean @ true to enable sprint and drift or false to disable.
@@ -791,6 +792,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field course CMO__TableOfWaypoints @ The unit"'"s course, as a table of waypoints
 ---Fuel type can be found in special var _enumTable_.FuelType
 ---@field UseCustomIntermittentEmissionOnly boolean @Activate the custom intermittent emissions 
+---@field target CMO__Contact @The unit target. Only for Weapons.
 ---@field fuel CMO__TableOfFuelStates @ FuelTable A table of fuel types used by unit (aggrogate) by type.  IF EDITING USE THIS or SetUnit() if you need specific tank refueling like a specific drop tank.
 ---@field fuels CMO__TableOfFuelStates @ FuelTable2 A table of fuel tanks used by unit each with an entry for the fuel involved for that tank. THIS IS READONLY
 ---@field mission CMO__Mission @ The unit"'"s assigned mission. Can be changed by setting to the Mission name or guid (calls ScenEdit_AssignUnitToMission).
@@ -995,7 +997,7 @@ function CMO__Unit:delete() end
 ---@field altitude number @ Altitude The altitude of the detonation
 
 ---@class CMO__LoadoutInfo:table @ A CMO Loadout information table used both in querying and setting loadout related or aircraft status data.
----@field UnitName string @The name/GUID of the unit to change the loadout on
+---@field unitname string @The name/GUID of the unit to change the loadout on
 ---@field LoadoutID number ? @The ID of the new loadout; 0 = use the current loadout <-- use that when just adjusting other entries like TTR.
 ---@field TimeToReady_Minutes ? number @How many minutes until the loadout is ready (default = database loadout time) (_optional_)
 ---@field IgnoreMagazines ? boolean @If the new loadout should rely on the magazines having the right weapons ready (default = false) (_optional_)
@@ -2113,7 +2115,7 @@ function ScenEdit_RefuelUnit(CMO__RefuelOptions) end
 
 ---Removes all Units, Contacts and weapons from a side.  
 ---Nearly certain this also removes the side itself as well.
----@param side string @ The name or guid of the side to remove.
+---@param side CMO__Side @ The name or guid of the side to remove.
 ---@return CMO__Side|nil @ a copy of side wrapper of the side before it was acted upon, or nil on failure.
 ---Example: local deletedSide = ScenEdit_RemoveSide("Blue");
 function ScenEdit_RemoveSide(side) end
@@ -2728,6 +2730,10 @@ function Tool_EmulateNoConsole(thevalue) end
 ---@return number @ the horizontal distance in nmi
 function Tool_Range(startLocation,endLocation) end
 
+---Creates a new scenario. Equivalent to Menu File -> Create New Scenario. If not DB is provided it will use the actual DB.
+---@param db string ?@The DB filename to create the new scenario
+function Tool_BuildBlankScenario(db) end
+
 --- completely undocumented. Internal Appears to be related to resetting error conditions or managing in-game LUA editor environment??
 --- hard to follow the what the delegate is actually doing.
 ---@param windowName string @ 
@@ -2824,3 +2830,13 @@ function ScenEdit_SetSimulationFidelity(fidelity) end
 ---@param buttons table @Buttons to display and interact
 ---@return table @Table with all the items from the HTML form and button pressed in key 'pressed'
 function UI_CallAdvancedHTMLDialog(title, html_message, buttons) end
+
+---comment
+---@param text string @Text to print to Exception Log
+function print_exc(text) end
+
+---comment
+---@param Latitude number @Latitude
+---@param Longitude number @Longitude
+---@param Altitude number ?@Altitude of the camera in meters
+function UI_SetCameraView(Latitude, Longitude,Altitude) end
