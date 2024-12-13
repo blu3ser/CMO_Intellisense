@@ -1311,7 +1311,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field loadoutid? number @Aircraft database loadout id (applicable to AIR)
 ---@field altitude? number @Unit altitude (applicable to AIR)
 ---@field depth? number @Unit depth (applicable to SUBMARINE - note no sign)
----@field orbit? number @Orbit index (applicable to SATELLITE)
+---@field orbit? string @Orbit index (applicable to SATELLITE)
 ---@field guid? string @Optional custom GUID to override auto one
 ---@field heading? number @optional heading in degrees to set the unit too now.
 ---@field desiredheading? number @ optional heading in degrees to set unit to turn-to.
