@@ -922,11 +922,13 @@ function CMO__Unit:delete() end
 ---@field max number @How much can be stored for the type
 ---@field name string @Name of the fuel type.
 ---@field type number @The type code of the fuel type. 2001 for example is AviationFuel.
-
 --- a table of CMO__FuelState records.
 --- if using unit.fuels then table returned is ipairs compatible 100% of time otherwise if using fuel avoid ipairs.
 ---@class CMO__TableOfFuelStates:table @<number,CMO__FuelState>.
-
+---@field current number @ The current fuel level of the type
+---@field max number @How much can be stored for the type
+---@field name string @Name of the fuel type.
+---@field type number @The type code of the fuel type. 2001 for example is AviationFuel.
 
 
 ---Note: if comp_type is cargo the entries  
@@ -1354,8 +1356,8 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 ---@class CMO__ContactSelector @ a side contact selector table.
 ---@field side string @ the sidename or guid of the side to search within.
----@field guid string @ the guid of the contact wrapper to select|get from this specific side, can also be a string name of the contact on that side.
-
+---@field guid? string @ the guid of the contact wrapper to select|get from this specific side, can also be a string name of the contact on that side.
+---@field unitname? string @ if used the name of the unit to select + side
 
 ---@class CMO__RefuelOptions:table
 ---@field side? string @ if used the side of the unit being selected + name
