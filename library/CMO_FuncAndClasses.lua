@@ -479,21 +479,21 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field patrolmission? table @ PatrolMission A table of the mission specific options. READ ONLY
 ---@field strikemission? table @ StrikeMission A table of the mission specific options. READ ONLY
 ---@field cargomission? table @ CargoMission A table of the mission specific options. READ ONLY
----@field TakeOffTime? string @ os.date() format for the take off time
----@field TimeOnTargetStation? string @ os.date() format for the time on target or station
+---@field TakeOffTime? string|osdate @ os.date() format for the take off time
+---@field TimeOnTargetStation? string|osdate @ os.date() format for the time on target or station
 
 ---@class CMO__Mission_AAR:table @MissionAAR table
 ---@field Doctrine_UseReplenishment? string @ When 'getting' this is string value of use_refuel_unrep (undocumented).
----@field use_refuel_unrep string @This is same as the one from Doctrine setting, meaning '0' yes-exlc tankers,'1' never,'2' Always-Inctank2tank.
----@field TankerUsage string @ or number Automatic(0), Mission(1)
----@field LaunchMissionWithoutTankersInPlace boolean @ self explainitory?
----@field TankerMissionList table @ {mission name or GUID Table of missions to use as source of refuellers, its GUIDs when getting, can use either when setting.
----@field TankerMinNumber_total number @ for tanker support mission?
----@field TankerMinNumber_airborne number @ for tanker support missions?
----@field TankerMinNumber_station number @ for tanker support missions?
----@field MaxReceiversInQueuePerTanker_airborne number @ self explainitory?
----@field FuelQtyToStartLookingForTanker_airborne number @Percentage of fuel (0-100) where units on this mission start trying to refuel.
----@field TankerMaxDistance_airborne string @ or number Use 'internal' or set a range. The code will match the lowest availble setting
+---@field use_refuel_unrep string? @This is same as the one from Doctrine setting, meaning '0' yes-exlc tankers,'1' never,'2' Always-Inctank2tank.
+---@field TankerUsage string? @ or number Automatic(0), Mission(1)
+---@field LaunchMissionWithoutTankersInPlace boolean? @ self explainitory?
+---@field TankerMissionList table? @ {mission name or GUID Table of missions to use as source of refuellers, its GUIDs when getting, can use either when setting.
+---@field TankerMinNumber_total number? @ for tanker support mission?
+---@field TankerMinNumber_airborne number? @ for tanker support missions?
+---@field TankerMinNumber_station number? @ for tanker support missions?
+---@field MaxReceiversInQueuePerTanker_airborne number? @ self explainitory?
+---@field FuelQtyToStartLookingForTanker_airborne number? @Percentage of fuel (0-100) where units on this mission start trying to refuel.
+---@field TankerMaxDistance_airborne string|number? @ or number Use 'internal' or set a range. The code will match the lowest availble setting
 ---@field TankerFollowsReceivers boolean @ undocumented.
 
 
@@ -556,7 +556,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field EscortUseGroupSize boolean @True if minimum size required
 ---@field StrikeOneTimeOnly boolean @True if activated
 ---@field StrikeMinimumTrigger string
----@field StrikeMax number
+---@field StrikeMax number @Max number of flights allowed
 ---@field StrikeFlightSize string|number Size
 ---@field StrikeMinAircraftReq number
 ---@field StrikeUseFlightSize boolean @True if minimum size required
