@@ -485,9 +485,13 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field cargomission? table @ CargoMission A table of the mission specific options. READ ONLY
 ---@field TakeOffTime? string|osdate @ os.date() format for the take off time
 ---@field TimeOnTargetStation? string|osdate @ os.date() format for the time on target or station
+---@field packagelist? table @ A table with the missions in a task pool (only if wrapper is a taskpool)
+---@field parentTaskPool? string @ GUID of the parent taskpool (only if wrapper is a package)
 ---@field OnDeactivateUnassign? boolean @ When mission is deactivate unassign the units
 ---@field OnDeactivateRTB? boolean @ When mission is deactivate, units RTB
 ---@field OnDeactivateDelete? boolean @ When mission is deactivate, delete mission
+
+
 
 ---@class CMO__Mission_AAR:table @MissionAAR table
 ---@field Doctrine_UseReplenishment? string @ When 'getting' this is string value of use_refuel_unrep (undocumented).
