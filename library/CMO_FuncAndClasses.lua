@@ -98,10 +98,10 @@ function CMO__Enum_Table:Doctrine(name)end
 
 
 ---@class CMO__Zone:table
----@field guid string @The GUID of the zone. READ ONLY.
----@field type string @ the type of the zone 'NoNavZone' = 0 | 'ExclusionZone' = 1
----@field description string @The description of the zone.
----@field isactive boolean @Zone is currently active.
+---@field guid? string @The GUID of the zone. READ ONLY.
+---@field type? string @ the type of the zone 'NoNavZone' = 0 | 'ExclusionZone' = 1 | 'Standard Zone' = -925
+---@field description? string @The description of the zone.
+---@field isactive? boolean @Zone is currently active.
 ---@field area CMO__TableOfReferencePoints @A set of reference points marking the zone. Can be updated by a list of RPs, or a table of new RP values.
 ---@field affects? table @List of unit types (ship, submarine, aircraft, facility)
 ---@field locked? boolean @Zone is locked or not.
@@ -150,10 +150,10 @@ function CMO__Enum_Table:Doctrine(name)end
 ---The side and newside must be string names and not guids. All three required.
 ---They must be in the order of t = {side=,name,newside}
 ---@class CMO__SideDescription:table
----@field guid string @guid of the unit to select.
+---@field guid string ?@guid of the unit to select.
 ---@field side string @The original string side name of unit.
----@field name string @Name or guid of the unit to change. 
----@field unitname string @Name or guid of the unit to change.(prefered when doing a set operation)
+---@field name string ?@Name or guid of the unit to change. 
+---@field unitname string ?@Name or guid of the unit to change.(prefered when doing a set operation)
 ---@field newside string @Name of the side to change the specified unit to.
 
 ---Either name or guid of the side may be used.
@@ -444,6 +444,10 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field Area table @a table containing at least lat and lons, or rps, representing defining the area.
 ---@field TargetFilter? CMO__TargetFilter-UnitsInArea @table of targetfilter entries
 
+---Table of reference points
+---@class CMO__Area:table
+
+
 
 --- Seperate for events, a targetfilter that does not have an area.  
 --- Important to note that if supplying this in say a trigger, and what you specify does not exist yet.
@@ -480,22 +484,29 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field patrolmission? table @ PatrolMission A table of the mission specific options. READ ONLY
 ---@field strikemission? table @ StrikeMission A table of the mission specific options. READ ONLY
 ---@field cargomission? table @ CargoMission A table of the mission specific options. READ ONLY
----@field TakeOffTime? string @ os.date() format for the take off time
----@field TimeOnTargetStation? string @ os.date() format for the time on target or station
+---@field TakeOffTime? string|osdate @ os.date() format for the take off time
+---@field TimeOnTargetStation? string|osdate @ os.date() format for the time on target or station
+---@field packagelist? table @ A table with the missions in a task pool (only if wrapper is a taskpool)
+---@field parentTaskPool? string @ GUID of the parent taskpool (only if wrapper is a package)
+---@field OnDeactivateUnassign? boolean @ When mission is deactivate unassign the units
+---@field OnDeactivateRTB? boolean @ When mission is deactivate, units RTB
+---@field OnDeactivateDelete? boolean @ When mission is deactivate, delete mission
+
+
 
 ---@class CMO__Mission_AAR:table @MissionAAR table
 ---@field Doctrine_UseReplenishment? string @ When 'getting' this is string value of use_refuel_unrep (undocumented).
----@field use_refuel_unrep number @This is same as the one from Doctrine setting, meaning '0' yes-exlc tankers,'1' never,'2' Always-Inctanktank.
----@field TankerUsage string @ or number Automatic(0), Mission(1)
----@field LaunchMissionWithoutTankersInPlace boolean @ self explainitory?
----@field TankerMissionList table @ {mission name or GUID Table of missions to use as source of refuellers, its GUIDs when getting, can use either when setting.
----@field TankerMinNumber_total number @ for tanker support mission?
----@field TankerMinNumber_airborne number @ for tanker support missions?
----@field TankerMinNumber_station number @ for tanker support missions?
----@field MaxReceiversInQueuePerTanker_airborne number @ self explainitory?
----@field FuelQtyToStartLookingForTanker_airborne number @Percentage of fuel (0-100) where units on this mission start trying to refuel.
----@field TankerMaxDistance_airborne string @ or number Use 'internal' or set a range. The code will match the lowest availble setting
----@field TankerFollowsReceivers boolean @ undocumented.
+---@field use_refuel_unrep string? @This is same as the one from Doctrine setting, meaning '0' yes-exlc tankers,'1' never,'2' Always-Inctank2tank.
+---@field TankerUsage string|number? @ or number Automatic(0), Mission(1)
+---@field LaunchMissionWithoutTankersInPlace boolean? @ self explainitory?
+---@field TankerMissionList table? @ {mission name or GUID Table of missions to use as source of refuellers, its GUIDs when getting, can use either when setting.
+---@field TankerMinNumber_total number? @ for tanker support mission?
+---@field TankerMinNumber_airborne number? @ for tanker support missions?
+---@field TankerMinNumber_station number? @ for tanker support missions?
+---@field MaxReceiversInQueuePerTanker_airborne number? @ self explainitory?
+---@field FuelQtyToStartLookingForTanker_airborne number? @Percentage of fuel (0-100) where units on this mission start trying to refuel.
+---@field TankerMaxDistance_airborne string|number? @ or number Use 'internal' or set a range. The code will match the lowest availble setting
+---@field TankerFollowsReceivers boolean? @ undocumented.
 
 
 
@@ -527,6 +538,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field TransitThrottleShip string|number @ preset string or numeric preset enum code.
 ---@field StationThrottleShip string|number @ preset string or numeric preset enum code.
 ---@field FlightSize string|number @ specialSize 1-6 max if you feed it anything outside that range it will revert to 1, and "5" is converted to 6.
+---@field OnStation string|number @ Number of units per class & loadout to try to keep on station
 --this can be "all",0=no preference, or 1-12. Though actual options are really only 1,2,3,4,6,8,12 Anything else will be set to all.
 ---@field MinAircraftReq string|number @ min aircraft required to start mission.
 ---@field UseFlightSize string @ 'inherit' or true|false boolean to use flightsize restrictions or not?
@@ -557,7 +569,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field EscortUseGroupSize boolean @True if minimum size required
 ---@field StrikeOneTimeOnly boolean @True if activated
 ---@field StrikeMinimumTrigger string
----@field StrikeMax number
+---@field StrikeMax number @Max number of flights allowed
 ---@field StrikeFlightSize string|number Size
 ---@field StrikeMinAircraftReq number
 ---@field StrikeUseFlightSize boolean @True if minimum size required
@@ -879,6 +891,10 @@ function CMO__Unit:delete() end
 ---Trigger the unit to launch from base (true) or abort launch (false).
 ---@param bool boolean @ true to launch, false to abort.
 function CMO__Unit:Launch(bool) end
+---comment
+---@param CMO__Area table @table of reference points
+---@return boolean @if unit is in the area
+function CMO__Unit:inArea(CMO__Area) end
 ---Calculate flat distance to a contact location.
 ---@param contactid string @ contact guid of the contact to calculate range too.
 ---@return number @ range in nmi.
@@ -2792,6 +2808,10 @@ function VP_GetSides() end
 ---@return CMO__Unit| CMO__Contact|nil @ either returns the requested unit or contact wrapper or nil on failure to locate.
 --- local u = VP_GetUnit({guid=SomeGuidHere});
 function VP_GetUnit(CMO__UnitSelector) end 
+
+---The function changes the current time compression
+---@param timecompression number @0 = One Second    1 = Two Seconds    2 = Five Seconds    3 = Fifteen Seconds    4 = Coarse One Sec Slice    5 = Coarse Five Sec Slice
+function VP_SetTimeCompression(timecompression) end
 
 --- @param UnitNameOrID string @The unit name or GUID. As no side is specified, GUID is more reliable
 ---@param text table @ of multiple string Text to show
