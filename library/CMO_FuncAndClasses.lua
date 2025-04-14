@@ -296,6 +296,7 @@ function CMO__Scenario:ResetScore() end
 ---@class CMO__Contact @CMO Contact Wrapper (userdata:table) 
 ---@field name string @name of the contact.
 ---@field guid string @The contact GUID. READ-ONLY.
+---@field tracknumber number @Unique number to id the contact
 ---@field actualunitid string @The contacts actual guid. READ-ONLY.
 ---@field latitude number @The latitude of the contact. READ-ONLY.
 ---@field longitude number  @The longitude of the contact. READ-ONLY.
@@ -484,7 +485,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 
 ---@class CMO__Mission_AAR:table @MissionAAR table
 ---@field Doctrine_UseReplenishment? string @ When 'getting' this is string value of use_refuel_unrep (undocumented).
----@field use_refuel_unrep string @This is same as the one from Doctrine setting, meaning '0' yes-exlc tankers,'1' never,'2' Always-Inctank2tank.
+---@field use_refuel_unrep number @This is same as the one from Doctrine setting, meaning '0' yes-exlc tankers,'1' never,'2' Always-Inctanktank.
 ---@field TankerUsage string @ or number Automatic(0), Mission(1)
 ---@field LaunchMissionWithoutTankersInPlace boolean @ self explainitory?
 ---@field TankerMissionList table @ {mission name or GUID Table of missions to use as source of refuellers, its GUIDs when getting, can use either when setting.
@@ -1190,7 +1191,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field engaging_ambiguous_targets ? string @Ignore(0), Optimistic(1), or Pessimistic(2)
 ---@field automatic_evasion ? boolean @True if the unit should automatically evade
 ---@field maintain_standoff ? boolean @True if the unit should try to avoid approaching its target, only valid for ships
----@field use_refuel_unrep ? string @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
+---@field use_refuel_unrep ? number @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
 ---@field engage_opportunity_targets ? boolean @True if the unit should take opportunistic shots
 ---@field use_sams_in_anti_surface_mode ? boolean @True if SAMs should be used to engage surface targets
 ---@field ignore_emcon_while_under_attack ? boolean @True if EMCON should be ignored and all systems should go active when engaged
@@ -1611,7 +1612,7 @@ function ScenEdit_AssignUnitAsTarget(AUNameOrIDOrTable,MissionNameOrID) end
 
 ---Assigns the specified unit to a mission.
 ---@param AUNameOrID string @ The unit name or guid. (since there is no side this is a good example of why you want to have unique names for units or use guids most places.)
----@param MissionNameOrID string @ The name of the mission or guid of the mission (since there is no side this is a good example of why you want unique mission names or use guids.)
+---@param MissionNameOrID string|nil @ The name of the mission or guid of the mission. Use nil to unassign the unit from the mission
 ---@param Escort? boolean @ If supplied and set to True indicates the unit is too be added as an escort.
 ---@param MissionPlanner? boolean @ defaults to false, undocumented pro? If true it may invoke the missionplanner immediately create the flight plan for the unit?
 ---@return boolean @ true on success, false on failure.
@@ -2757,6 +2758,15 @@ function VP_ExportUnits(filtertable,filename) end
 ---local a_contact = VP_GetContact({guid="SomeContacGuidHere"});
 function VP_GetContact(CMO__VPContactSelector) end
 
+---changes the current time compression ( the 'x#' on the UI).
+---@param compression number @Number to select the speed
+---0 -- 1x 
+---1 -- 2x
+---2 -- 5x
+---3 -- 15x
+---4 -- Flame Speed 
+---5 -- Double Flame
+function VP_SetTimeCompression(compression) end
 ---Exposes current scenario information.  
 ---@return CMO__Scenario
 ---local sceneFileName = VP_GetScenario().FileName;
