@@ -100,15 +100,15 @@ function CMO__Enum_Table:Doctrine(name)end
 ---@class CMO__Zone:table
 ---@field guid? string @The GUID of the zone. READ ONLY.
 ---@field type? string @ the type of the zone 'NoNavZone' = 0 | 'ExclusionZone' = 1 | 'Standard Zone' = -925
----@field description? string @The description of the zone.
+---@field description string @The description of the zone.
 ---@field isactive? boolean @Zone is currently active.
----@field area CMO__TableOfReferencePoints @A set of reference points marking the zone. Can be updated by a list of RPs, or a table of new RP values.
+---@field area CMO__TableOfReferencePoints? @A set of reference points marking the zone. Can be updated by a list of RPs, or a table of new RP values.
 ---@field affects? table @List of unit types (ship, submarine, aircraft, facility)
 ---@field locked? boolean @Zone is locked or not.
 ---@field markas? string @Posture of violator of exclusion zone.
 ---@field relativeto? string @ unitname or unitguid of unit to make this zones area relative-to. (undocumented) Also the side of the unit must match the 
 ---@field rename? string @ name to rename the description/name to [only applies for calls to ScenEdit_SetZone]
-
+---@field noFire? boolean @ Drop targets that are inside a No Fly Zone
 
 ---@alias CMO__TableOfZones table<integer,CMO__Zone> @ a table of CMO_Zone tables.
 
@@ -471,7 +471,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field side ? string @The side the Mission belongs to.
 ---@field starttime ? string|osdate @ DateTime Time mission starts.
 ---@field endtime ? string|osdate @DateTime Time mission ends.
----@field type ? string @MissionClass Mission class(patrol,strike,etc). READ ONLY
+---@field type ? number @Mission Type 
+---@field typeS ? string @MissionClass Mission class(patrol,strike,etc). READ ONLY
 ---@field subtype ? string @MissionSubClass Mission class(asw,land,etc). READ ONLY
 ---@field SISH ? boolean @'Scrub if side human' tick box
 ---@field unitlist ? table @ A table of units assigned to mission containing GUIDs of the units . READ ONLY
