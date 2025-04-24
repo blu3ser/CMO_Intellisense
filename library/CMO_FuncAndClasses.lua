@@ -2774,15 +2774,7 @@ function VP_ExportUnits(filtertable,filename) end
 ---local a_contact = VP_GetContact({guid="SomeContacGuidHere"});
 function VP_GetContact(CMO__VPContactSelector) end
 
----changes the current time compression ( the 'x#' on the UI).
----@param compression number @Number to select the speed
----0 -- 1x 
----1 -- 2x
----2 -- 5x
----3 -- 15x
----4 -- Flame Speed 
----5 -- Double Flame
-function VP_SetTimeCompression(compression) end
+
 ---Exposes current scenario information.  
 ---@return CMO__Scenario
 ---local sceneFileName = VP_GetScenario().FileName;
