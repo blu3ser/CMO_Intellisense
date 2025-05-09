@@ -471,7 +471,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field side ? string @The side the Mission belongs to.
 ---@field starttime ? string|osdate @ DateTime Time mission starts.
 ---@field endtime ? string|osdate @DateTime Time mission ends.
----@field type ? number @Mission Type 
+---@field type ? string @Mission Type 
 ---@field typeS ? string @MissionClass Mission class(patrol,strike,etc). READ ONLY
 ---@field subtype ? string @MissionSubClass Mission class(asw,land,etc). READ ONLY
 ---@field SISH ? boolean @'Scrub if side human' tick box
@@ -1205,7 +1205,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field engage_non_hostile_targets ? boolean @True if the unit should attempt hostile action against units that are not hostile
 ---@field rtb_when_winchester ? boolean @(obsolete, see the new doctrine options) True if the unit should return to base when out of weapons
 ---@field ignore_plotted_course ? boolean @True if the unit should ignore plotted course
----@field engaging_ambiguous_targets ? string @Ignore(0), Optimistic(1), or Pessimistic(2)
+---@field engaging_ambiguous_targets ? number @Ignore(0), Optimistic(1), or Pessimistic(2)
 ---@field automatic_evasion ? boolean @True if the unit should automatically evade
 ---@field maintain_standoff ? boolean @True if the unit should try to avoid approaching its target, only valid for ships
 ---@field use_refuel_unrep ? number @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
