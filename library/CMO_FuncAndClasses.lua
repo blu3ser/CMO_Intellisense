@@ -1724,7 +1724,9 @@ function ScenEdit_DeleteUnit(CMO__UnitSelector,includeMembers) end
 ---@Example: ScenEdit_DistributeWeaponAtAirbase({guid="someairbasegroupguid",WPN_DBID="2378","32"}) --add 32 agm158c to one mag on each unit that has one if room.
 function ScenEdit_DistributeWeaponAtAirbase(ParamTable) end
 
-
+---Set the scenario title
+---@param title @string 'The scenario title'
+function SetScenarioTitle(title) end
 ---Ends the current scenario and triggers any End_Scenario related events (should work properly in 1147.27+).
 function ScenEdit_EndScenario() end
 
