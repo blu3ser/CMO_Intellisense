@@ -132,8 +132,8 @@ function CMO__Enum_Table:Doctrine(name)end
 ---@field Longitude number @ lon in decimal format
 
 ---@class CMO__Location:table @ latitude and longitude entry.
----@field latitude number|string @ lat in decimal format
----@field longitude number|string @ lon in decimal format
+---@field latitude number @ lat in decimal format
+---@field longitude number @ lon in decimal format
 ---@alias CMO__TableOfLocations table<integer,CMO__Location>
 
 
@@ -1221,9 +1221,9 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field weapon_control_status_land ? string|integer @Free(0), Tight(1), Hold(2)
 ---@field refuel_unrep_allied ? string @Yes(0), Yes_ReceiveOnly(1), Yes_DeliverOnly(2), No(3)
 ---@field fuel_state_planned ? string|integer @ CMO__Constants.WRAFuelState See _enumTable_:Doctrine("fuelstate"), Bingo(0), Joker10Percent(1), Joker20Percent(2), Joker25Percent(3), Joker30Percent(4), Joker40Percent(5), Joker50Percent(6), Joker60Percent(7), Joker70Percent(8), Joker75Percent(9), Joker80Percent(10), Joker90Percent(11)
----@field fuel_state_rtb ? string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
+---@field fuel_state_rtb ? integer @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
 ---@field weapon_state_planned ? string|integer @ CMO__Constants.WRAWeaponState @See _enumTable_:Doctrine("weaponstate")
----@field weapon_state_rtb ? string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
+---@field weapon_state_rtb ? integer @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
 ---@field gun_strafing ? string @No(0), Yes(1)
 ---@field jettison_ordnance ? string @No(0), Yes(1)
 ---@field avoid_contact ? string @No(0), Yes_ExceptSelfDefence(1), Yes_Always(2)
@@ -1266,8 +1266,8 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field guid? string @ guid of the unit to use to select the unit.
 ---@field side? string @ side or guid of the side to use to select the unit
 ---@field unitname? string @ name of the unit to use to select the unit.
----@field fires? string|number @ string code for the fire or number 0-4 CMO__Constants.FireIntensityLevels
----@field flood? string|number @ string code for the fire or number 0-4 CMO__Constants.FloodingIntensityLevel
+---@field fires? string|integer @ string code for the fire or number 0-4 CMO__Constants.FireIntensityLevels
+---@field flood? string|integer @ string code for the fire or number 0-4 CMO__Constants.FloodingIntensityLevel
 ---(AS of 1147.30 this takes a integer request has been put in for it to change to single prior version were hard ints)
 ---https://www.matrixgames.com/forums/tm.asp?m=5035836 logged as #14602
 ---@field dp number @ the number of DPs to remove from the units present number. If you want to add dps back use negative numbers. 
