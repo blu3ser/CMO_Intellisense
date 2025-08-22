@@ -132,8 +132,8 @@ function CMO__Enum_Table:Doctrine(name)end
 ---@field Longitude number @ lon in decimal format
 
 ---@class CMO__Location:table @ latitude and longitude entry.
----@field latitude number|string @ lat in decimal format
----@field longitude number|string @ lon in decimal format
+---@field latitude number @ lat in decimal format
+---@field longitude number @ lon in decimal format
 ---@alias CMO__TableOfLocations table<integer,CMO__Location>
 
 
@@ -471,7 +471,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field side ? string @The side the Mission belongs to.
 ---@field starttime ? string|osdate @ DateTime Time mission starts.
 ---@field endtime ? string|osdate @DateTime Time mission ends.
----@field type ? number|string @Mission Type 
+---@field type ? string @Mission Type 
 ---@field typeS ? string @MissionClass Mission class(patrol,strike,etc). READ ONLY
 ---@field subtype ? string @MissionSubClass Mission class(asw,land,etc). READ ONLY
 ---@field SISH ? boolean @'Scrub if side human' tick box
@@ -1205,7 +1205,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field engage_non_hostile_targets ? boolean @True if the unit should attempt hostile action against units that are not hostile
 ---@field rtb_when_winchester ? boolean @(obsolete, see the new doctrine options) True if the unit should return to base when out of weapons
 ---@field ignore_plotted_course ? boolean @True if the unit should ignore plotted course
----@field engaging_ambiguous_targets ? string @Ignore(0), Optimistic(1), or Pessimistic(2)
+---@field engaging_ambiguous_targets ? number @Ignore(0), Optimistic(1), or Pessimistic(2)
 ---@field automatic_evasion ? boolean @True if the unit should automatically evade
 ---@field maintain_standoff ? boolean @True if the unit should try to avoid approaching its target, only valid for ships
 ---@field use_refuel_unrep ? number @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
@@ -1221,9 +1221,9 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field weapon_control_status_land ? string|integer @Free(0), Tight(1), Hold(2)
 ---@field refuel_unrep_allied ? string @Yes(0), Yes_ReceiveOnly(1), Yes_DeliverOnly(2), No(3)
 ---@field fuel_state_planned ? string|integer @ CMO__Constants.WRAFuelState See _enumTable_:Doctrine("fuelstate"), Bingo(0), Joker10Percent(1), Joker20Percent(2), Joker25Percent(3), Joker30Percent(4), Joker40Percent(5), Joker50Percent(6), Joker60Percent(7), Joker70Percent(8), Joker75Percent(9), Joker80Percent(10), Joker90Percent(11)
----@field fuel_state_rtb ? string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
+---@field fuel_state_rtb ? integer @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
 ---@field weapon_state_planned ? string|integer @ CMO__Constants.WRAWeaponState @See _enumTable_:Doctrine("weaponstate")
----@field weapon_state_rtb ? string @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
+---@field weapon_state_rtb ? integer @No(0), YesLastUnit(1), YesFirstUnit(2), YesLeaveGroup(3)
 ---@field gun_strafing ? string @No(0), Yes(1)
 ---@field jettison_ordnance ? string @No(0), Yes(1)
 ---@field avoid_contact ? string @No(0), Yes_ExceptSelfDefence(1), Yes_Always(2)
@@ -1266,8 +1266,8 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field guid? string @ guid of the unit to use to select the unit.
 ---@field side? string @ side or guid of the side to use to select the unit
 ---@field unitname? string @ name of the unit to use to select the unit.
----@field fires? string|number @ string code for the fire or number 0-4 CMO__Constants.FireIntensityLevels
----@field flood? string|number @ string code for the fire or number 0-4 CMO__Constants.FloodingIntensityLevel
+---@field fires? string|integer @ string code for the fire or number 0-4 CMO__Constants.FireIntensityLevels
+---@field flood? string|integer @ string code for the fire or number 0-4 CMO__Constants.FloodingIntensityLevel
 ---(AS of 1147.30 this takes a integer request has been put in for it to change to single prior version were hard ints)
 ---https://www.matrixgames.com/forums/tm.asp?m=5035836 logged as #14602
 ---@field dp number @ the number of DPs to remove from the units present number. If you want to add dps back use negative numbers. 
@@ -1724,7 +1724,9 @@ function ScenEdit_DeleteUnit(CMO__UnitSelector,includeMembers) end
 ---@Example: ScenEdit_DistributeWeaponAtAirbase({guid="someairbasegroupguid",WPN_DBID="2378","32"}) --add 32 agm158c to one mag on each unit that has one if room.
 function ScenEdit_DistributeWeaponAtAirbase(ParamTable) end
 
-
+---Set the scenario title
+---@param title @string 'The scenario title'
+function SetScenarioTitle(title) end
 ---Ends the current scenario and triggers any End_Scenario related events (should work properly in 1147.27+).
 function ScenEdit_EndScenario() end
 
@@ -2775,15 +2777,7 @@ function VP_ExportUnits(filtertable,filename) end
 ---local a_contact = VP_GetContact({guid="SomeContacGuidHere"});
 function VP_GetContact(CMO__VPContactSelector) end
 
----changes the current time compression ( the 'x#' on the UI).
----@param compression number @Number to select the speed
----0 -- 1x 
----1 -- 2x
----2 -- 5x
----3 -- 15x
----4 -- Flame Speed 
----5 -- Double Flame
-function VP_SetTimeCompression(compression) end
+
 ---Exposes current scenario information.  
 ---@return CMO__Scenario
 ---local sceneFileName = VP_GetScenario().FileName;
