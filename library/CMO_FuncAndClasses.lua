@@ -471,7 +471,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field side ? string @The side the Mission belongs to.
 ---@field starttime ? string|osdate @ DateTime Time mission starts.
 ---@field endtime ? string|osdate @DateTime Time mission ends.
----@field type ? number @Mission Type 
+---@field type ? number|string @Mission Type 
 ---@field typeS ? string @MissionClass Mission class(patrol,strike,etc). READ ONLY
 ---@field subtype ? string @MissionSubClass Mission class(asw,land,etc). READ ONLY
 ---@field SISH ? boolean @'Scrub if side human' tick box
@@ -2854,6 +2854,10 @@ function Command_SaveScen(path) end
 ---Set the simulation fidelity
 ---@param fidelity number @0.1, 1, 5 
 function ScenEdit_SetSimulationFidelity(fidelity) end
+
+---The function's purpose is to get the number of time 'ticks' based on the current game time. This is a low level counter of time past 
+---@return string @The number ticks based on date/time 
+function ScenEdit_GetDateTimeTick() end
 
 ---Creates a window with an HTML message to allow input data from a custom HTML Form. See https://commandlua.github.io/assets/Function_UI_CallAdvancedHTMLDialog.html
 ---@param title string @Title of the document
