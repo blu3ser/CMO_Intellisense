@@ -2168,10 +2168,12 @@ function ScenEdit_RemoveZone(sideName,zoneType,paramTable) end
 ---You can use basic window path minipulation to override the above behavior. see Examples.  
 ---A file can also be loaded indirectly from an attachment ScenEdit_UseAttachment
 ---@param filePathName string @ file name including any additional or reductive path elements
+---@param customPath? boolean @ True if use the absolute path (only PRO), default to false
+---@return boolean|nil @nil, file not found or with syntax issue. False, execution error (e.g. adding unit to non existing side) True, execution completed successfully
 ---Example: ScenEdit_RunScript('Madonna\\GetIntoTheGroove.lua') --runs script cmopath\\Lua\\Madonna\\GetIntoTheGrove.lua
 ---Example2: ScenEdit_RunScript('..\\Scenarios\\SomeFolderHere\\SomeOtherFolder\\Lua\\myscript.lua')  
 ---In #2 the actual path executed is something like "e:\\Games\\CMO\\Lua\\..\\Scenarios\\SomeFolderHere\\SomeOtherFolder\\Lua\\myscript.lua"
-function ScenEdit_RunScript(filePathName) end
+function ScenEdit_RunScript(filePathName, customPath)  end
 
 
 ---Returns a table of selected units and or contacts currently selected in the gui buy the player.  
