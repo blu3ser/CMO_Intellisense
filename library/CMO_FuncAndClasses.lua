@@ -42,6 +42,11 @@ CMO version at time: 1.05.1309.10
 ---@class CMO__VPContactSelector:table
 ---@field guid string @ guid of the contact.
 
+---@class CMO__Enablers:table
+---@field GNSS_NavIC boolean @True if the property is enabled 
+---@field GNSS_BeiDou boolean @True if the property is enabled
+---@field GNSS_GLONASS boolean @True if the property is enabled
+---@field GNSS_GPS boolean @True if the property is enabled
 
 ---@class CMO__DoctrineWRASelector:table @ Selects a WRA doctrine for on a side, group, mission, or unit. weapon_id is mandatory.  
 ---One of side, mission, unitname or guid is mandatory. One of contact_id or target_type is mandatory  
@@ -109,9 +114,17 @@ function CMO__Enum_Table:Doctrine(name)end
 ---@field relativeto? string @ unitname or unitguid of unit to make this zones area relative-to. (undocumented) Also the side of the unit must match the 
 ---@field rename? string @ name to rename the description/name to [only applies for calls to ScenEdit_SetZone]
 ---@field noFire? boolean @ Drop targets that are inside a No Fly Zone
-
+---@field areacolor? string @The HTML color code expressed as a number - convert to hex to check against a HTML color chart
+---@field enablers? CMO__Enablers @Enablers of the area
+---@field weatherprofile? CMO__Weather
+---@field hascustomlandcoverheight? boolean @Custom environment zone has a custom land cover height set. 
+---@field landcoverheight? number @The height of the land cover within a custom environment zone. 
+---@field landcovertype? number @LandCoverType
+---@field thermallayerceiling? number @The depth of the thermal layer ceiling within a custom environment zone.
+---@field thermallayerfloor ?	number 	@The depth of the thermal layer floor within a custom environment zone.
+---@field thermallayerstrength? 	number 	@The strength of the thermal layer within a custom environment zone.
+---@field convergencezoneinterval? 	number 	@The interval (in nm) between convergence zones within a custom environment zone. 
 ---@alias CMO__TableOfZones table<integer,CMO__Zone> @ a table of CMO_Zone tables.
-
 
 ---@class CMO__HostUnit:table @Source and destination unitnames or guids.
 ---@field HostedUnitNameOrID string @The name or GUID of the unit to put into the host.
@@ -207,6 +220,9 @@ function CMO__Enum_Table:Doctrine(name)end
 ---@field bearingtype? number @Type of bearing Fixed (0) or Rotating (1).
 ---@field relativeto? CMO__Unit @The unit that reference point is realtive to.
 ---@field hidden? boolean @ indicates if the RP should be hidden from the player.
+---@field color? string @The HTML color code expressed as a number - convert to hex to check against a HTML color chart 
+---@field relativeDistance number @Relative distance of RP to 'relativeto' unit 
+---@field relativeBearing number @Relative bearing ( 0 - 360) of RP to 'relativeto' unit 
 ---@alias CMO__TableOfReferencePoints table<number,CMO__ReferencePoint> @table of ReferencePoints.
 
 
@@ -394,6 +410,8 @@ function CMO__Contact:inArea(area) end
 ---@field contacts CMO__SideContact @Table of current contacts for the designated side. READ ONLY.
 ---@field exclusionzones CMO__TableOfZones @Table of Zones for the designated side READ ONLY.
 ---@field nonavzones CMO__TableOfZones @Table of Zones for the designated side READ ONLY.
+---@field standardzones CMO__TableOfZones @Table of Standard zones for the designated side READ ONLY.
+---@field customenvironmentzones CMO__TableOfZones @Table of Custom Environment zones for the designated side READ ONLY.
 ---@field rps CMO__TableOfReferencePoints @Table of ReferencePoints for the designated side READ ONLY.
 ---@field awareness number @Awareness READ ONLY.
 ---@field proficiency number @Proficiency READ ONLY.
@@ -413,6 +431,17 @@ function CMO__Side:getexclusionzone(ZoneIdentifier) end --Returns matching Zone 
 ---@param ZoneIdentifier string @ZoneGuid|ZoneName|ZoneDescription of the zone to get.
 ---@return CMO__Zone|nil @returns Zone or nil on no match.
 function CMO__Side:getnonavzone(ZoneIdentifier) end
+
+---Method returns first matching standard zone
+---@param ZoneIdentifier string @Guid identifier of the zone to retrieve
+---@return CMO__Zone @The zone wrapper
+function CMO__Side:getstandardzone(ZoneIdentifier) end
+
+---Method returns first matching custom enviroment zone
+---@param ZoneIdentifier string @Guid identifier of the zone to retrieve
+---@return CMO__Zone @The zone wrapper
+function CMO__Side:getcustomenvironmentzone(ZoneIdentifier) end
+
 ---Method returns table of units filtered by type of unit or nil. Note that if using SubType but not Category remember to feed Category as nil.
 ---@param UnitType string @Type of the unit to filer on ('Aircraft','Submarine','Ship',etc..).
 ---@param Category? string @Category of a unit type to additionally filter on ('Aircraft','Submarine','Ship',etc..) may not apply to all types.
@@ -422,10 +451,7 @@ function CMO__Side:getnonavzone(ZoneIdentifier) end
 ---u = side:unitsBy('Ship', 2002, 3003) -- ships fitered for 'Surface combatant' and 'BBC'
 function CMO__Side:unitsBy(UnitType,Category,Subtype) end
 
----comment
----@param ZoneIdentifier string @Guid identifier of the zone to retrieve
----@return table @A table with the RP names of the zone
-function CMO__Side:getstandardzone(ZoneIdentifier) end
+
 
 ---Method returns table of current contacts filtered by type of unit or nil
 ---@param UnitType string @Type of the unit to filer on ('Aircraft','Submarine','Ship',etc..).
