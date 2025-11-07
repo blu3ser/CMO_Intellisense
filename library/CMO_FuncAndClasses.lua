@@ -68,6 +68,7 @@ CMO version at time: 1.05.1309.10
 ---@field number number @ Number to add
 ---@field remove? boolean @ If true, this will debuct the number of weapons
 ---@field fillout? boolean @ If true, will fill out the weapon record to its maximum
+---@field addasacell? boolean @Default true. If false, add only one weapon to a cell
 
 ---@class CMO__TargetInformation:table @Target information for units
 ---@field CMO_Contact @ The Contact information of the unit
@@ -96,6 +97,13 @@ local CMO__Enum_Table = {}
 ---@return table|nil @ returns table <integer-enumvalue,string-value>
 function CMO__Enum_Table:Doctrine(name)end
 
+
+---@class CMO__FlightplanDate
+---@field DATEONTARGET string|nil  -- The mission time on target day, YYYY/MM/DD
+---@field TIMEONTARGET string|nil  -- The mission time on target, HH:MM:SS
+---@field TAKEOFFDATE string|nil   -- The mission takeoff day, YYYY/MM/DD
+---@field TAKEOFFTIME string|nil   -- The mission takeoff time, HH:MM:SS
+local CMO__FlightplanDate = {}
 
 ---@class CMO__Zone:table
 ---@field guid? string @The GUID of the zone. READ ONLY.
@@ -395,6 +403,7 @@ function CMO__Contact:inArea(area) end
 ---@field exclusionzones CMO__TableOfZones @Table of Zones for the designated side READ ONLY.
 ---@field nonavzones CMO__TableOfZones @Table of Zones for the designated side READ ONLY.
 ---@field rps CMO__TableOfReferencePoints @Table of ReferencePoints for the designated side READ ONLY.
+---@field enablers CMO__EnablersTable @Table of side enablers technology
 ---@field awareness number @Awareness READ ONLY.
 ---@field proficiency number @Proficiency READ ONLY.
 ---@field hasmines boolean @idk side has mines? READ ONLY.
@@ -569,7 +578,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field EscortGroupSize string|number Size
 ---@field EscortUseGroupSize boolean @True if minimum size required
 ---@field StrikeOneTimeOnly boolean @True if activated
----@field StrikeMinimumTrigger string
+---@field StrikeMinimumTrigger string @Minimun stance of contact to trigger the mission
 ---@field StrikeMax number @Max number of flights allowed
 ---@field StrikeFlightSize string|number Size
 ---@field StrikeMinAircraftReq number
@@ -675,6 +684,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field Zone table @ names or GUID Table, of reference point names and/or GUIDs {RP1,RP2,RP3...or their guids}
 ---@field LoopType string @Values of ContinousLoop(0) or SingleLoop(1)
 ---@field OnStation string|number @ converted to int, number of units to keep on station.
+---@field StationGroupingType string|number @ByLoadout = 0; ByUnitClass = 1; NoGrouping = 2
 ---@field OneTimeOnly string  @ 'inherit' or true|false boolean Mission or flights are one-time only.
 ---@field ActiveEMCON string  @ 'inherit' or true|false boolean to Activate EMCON inside zone\path\track only.
 ---@field TankerOneTime string  @ 'inherit' or true|false boolean to Allow tankers only do one refueling per flight.
@@ -716,6 +726,12 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field arc_mount? CMO__ArcTable @ The effective arcs for the particular mount [override defaults]
 
 
+
+---@class CMO__EnablersTable:table @Table of enablers for a side. By default { GNSS_NavIC = 'Yes', GNSS_BeiDou = 'Yes', GNSS_GLONASS = 'Yes', GNSS_GPS = 'Yes' }
+---@field GNSS_NavIC boolean?
+---@field GNSS_BeiDou boolean?
+---@field GNSS_GLONASS boolean?
+---@field GNSS_GPS boolean?
 
 ---Used with ScenEdit_UpdateUnit()  
 ---For the 'delta' mode, the function willl look for a matching GUID (or unit name if no GUID match) in the INI file.  
@@ -1919,6 +1935,11 @@ function ScenEdit_GetReferencePoints(CMO__ReferencePointSelector) end
 ---@return boolean @ true if the scene has started.
 function ScenEdit_GetScenHasStarted() end
 
+---comment
+---@param SideName string @Name of the side
+---@param MissionName any @Name/Guid of the mission
+---@param options CMO__FlightplanDate @ DATEONTARGET = "YYYY/MM/DD", TIMEONTARGET = "HH:MM:SS" or TAKEOFFDATE and TAKEOFFTIME with same date format
+function ScenEdit_CreateMissionFlightPlan(SideName, MissionName, options) end
 
 ---Returns the current score for the side.
 ---Like in some other functions 'PlayerSide' can be used as a special code-word to represent the current Human player side.
