@@ -804,6 +804,14 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field CSAR? boolean @ true to enable SAR flag on a unit false to disable.  (This is SAR_enabled on the actual Unit Wrapper)
 ---@field TimeToReady_Minutes? number @ number of minutes till the unit is ready if on the ground.  (this could be set via SetLoadout as well.)
 
+---@class CMO__Quickturnaround
+---@field state? boolean @ Is quick turnaround enabled for the aircraft.
+---@field sorties? number @ The number of sorties the aircraft has flown in quick turnaround mode.
+---@field totalsorties? number @ The total number of sorties the aircraft has flown in quick turnaround mode.
+---@field extratime? number @ The penalty time (minutes) to apply to the aircraft on reaching quick turnaround.
+---@field airborne? number @ Total airborne time (seconds) while in quick turnaround mode.
+---@field avgsortietime? number @ Average sortie time while in quick turnaround mode.
+---@field reset? boolean @ When setting unit quick turnaround, adding this parameter will reset the above numbers as if just starting in quick turnaround mode.
 
 ---@class CMO__LoadoutAvailable:table @LoadoutAvailable
 ---@field LoadoutDBID number @Number of loadout
@@ -906,6 +914,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field pitch number @ the current pitch of the unit as a floating point number (aircraft or munition).
 ---@field roll number @The unit roll as a floating point number (aircraft)
 ---@field groundspeed number @ the current groundspeed of the unit as a float.
+---@field quickTurnaround CMO__Quickturnaround @Current quick turnaround values if an aircraft with a loadout 
 ---@type CMO__Unit
 
 ---@class CMO_Unit
