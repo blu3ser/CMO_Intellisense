@@ -576,6 +576,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field FlightSize string|number @ specialSize 1-6 max if you feed it anything outside that range it will revert to 1, and "5" is converted to 6.
 ---@field OnStation string|number @ Number of units per class & loadout to try to keep on station
 --this can be "all",0=no preference, or 1-12. Though actual options are really only 1,2,3,4,6,8,12 Anything else will be set to all.
+---@field StationGroupingType number|string @ 	ByLoadout = 0; ByUnitClass = 1; NoGrouping = 2
 ---@field MinAircraftReq string|number @ min aircraft required to start mission.
 ---@field UseFlightSize string @ 'inherit' or true|false boolean to use flightsize restrictions or not?
 ---@field GroupSize? string|number @ Size @ applies to ships\subs\etc same as flightsize valid options are "all" (which actually means none), and 1,2,3,4,6. >6 gets set to 1.
@@ -836,6 +837,7 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field latitude number @ Latitude The latitude of the unit.
 ---@field longitude number @ Longitude The longitude of the unit.
 ---@field dbid number @ The database ID of the unit READ ONLY
+---@field AllowMultiMission boolean @ True if the unit is allowed to be assigned to multiple missions.
 ---@field altitude number @ The altitude of the unit in meters.
 ---@field speed number @ The unit"'"s current speed.
 ---@field throttle string|number @ Throttle The unit"'"s current throttle setting.
