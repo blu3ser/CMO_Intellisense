@@ -1259,6 +1259,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field engaging_ambiguous_targets ? number @Ignore(0), Optimistic(1), or Pessimistic(2)
 ---@field automatic_evasion ? boolean @True if the unit should automatically evade
 ---@field maintain_standoff ? boolean @True if the unit should try to avoid approaching its target, only valid for ships
+---@field bingo_threshold ? boolean @0 Bingo 30%, 1 Bingo 40%, 2 Bingo 50%, 3 Bingo 60%, 4 Bingo 70%, 5 Bingo 80%
 ---@field use_refuel_unrep ? number @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
 ---@field engage_opportunity_targets ? boolean @True if the unit should take opportunistic shots
 ---@field use_sams_in_anti_surface_mode ? boolean @True if SAMs should be used to engage surface targets
@@ -1284,14 +1285,20 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field use_aip ? string @No(0), Yes_AttackOnly(1), Yes_Always(2)
 ---@field dipping_sonar ? string @Automatically_HoverAnd150ft(0), ManualAndMissionOnly(1)
 ---@field bvr_logic ? string @StraightIn(0), Crank(1), Drag(2)
----@field withdraw_on_damage ? string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
----@field withdraw_on_fuel ? string @Ignore(0), Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
----@field withdraw_on_attack ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field withdraw_on_defence ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field deploy_on_damage ? string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
----@field deploy_on_fuel ? string @Ignore(0) Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
----@field deploy_on_attack ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field deploy_on_defence ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field withdraw_on_damage ? string|integer @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
+---@field withdraw_on_fuel ? string|integer @Ignore(0), Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
+---@field withdraw_on_attack ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field withdraw_on_defence ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field deploy_on_damage ? string|integer @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
+---@field deploy_on_fuel ? string|integer @Ignore(0) Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
+---@field deploy_on_attack ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field deploy_on_defence ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---'drop guidance' -> the firing platform will drop guidance when it becomes impossible for the guided missile to intercept the target. This can allow a following weapon to make the intercept, or the firing platform to fire another shot, as it frees up the guidance system. (numeric value only)
+---@field aaw_guidance ? integer @0=Always Continue Guidance, 1=Drop Guidance
+---'Rearward' is based on the heading of the target -- if the target is heading away from the firing platform then it is 'to the rear'. Imagine a line perpendicular to the heading of the incoming target -- if the target goes 'behind' this line OR if the intercept point is behind this line, then the firing platform will drop the target. Can apply to aircraft and missile targets or just aircraft or just missiles, depending on the option chosen. (numeric value only)
+---@field aaw_rearward_fire ? integer @0=Always Fire, 1=Fire vs Aircraft or Weapons only if interception is between shooter and target, 2=Fire vs Aircraft only if interception is between shooter and target, 3=Fire vs Weapons only if interception is between shooter and target
+---How many different weapons need to be fired against target aircraft or target weapons or both. 'Fulfilled separately' means if two different weapons from two different units can fire at the target, they will fire to allocate the weapon salvo. If the setting is by ANY guided weapon, only one weapon type will be used. (numeric value only)
+---@field aaw_wra_qty ? integer @0=For all targets WRA is fulfilled separately, 1=For Aircraft or Weapons WRA is fulfilled by ANY guided weapon, 2=For Aircraft WRA is fulfilled by ANY guided weapon, 3=For Weapons WRA is fulfilled by ANY guided weapon
 
 ---A WRA Doctrine entry. Obtained\set via GetDoctrineWRA(selector) | SetDoctrineWRA(selector,WRA)
 ---When getting if .WRA is nil then it's using inherited options.  
@@ -1410,12 +1417,12 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 ---@class CMO__AttackOptions @ attack options table to use with AttackContact()
 ---@field mode string|number @Targeting mode "AutoTargeted"|"0", "ManualWeaponAlloc"|"1","ManualTargeted"|"2"   (Defaults to AutoTageted.) Use 2 for BOL, and|or mount options.
----@field mount number @If used The attackers mount DBID or 0 for loadout mount. (default to loadout if not specified)
----@field weapon number @The attackers weapon DBID (ai choses weapon if not specified, typically based on WRA.)
----@field qty number @How many to allocate (ai choses number based on WRA if not specified )
----@field latitude number @ If BOL used, the latitude to attack.
----@field longitude number @ If BOL used, the longitude to attack.
----@field course CMO__TableOfWaypoints @ If BOL use, a table of waypoints representing the course the weapon should use IF the weapon is course programable. Limited to the number of course entries allowed for the weapon in the database, typically at least 20.
+---@field mount? number @If used The attackers mount DBID or 0 for loadout mount. (default to loadout if not specified)
+---@field weapon? number @The attackers weapon DBID (ai choses weapon if not specified, typically based on WRA.)
+---@field qty? number @How many to allocate (ai choses number based on WRA if not specified )
+---@field latitude? number @ If BOL used, the latitude to attack.
+---@field longitude? number @ If BOL used, the longitude to attack.
+---@field course? CMO__TableOfWaypoints @ If BOL use, a table of waypoints representing the course the weapon should use IF the weapon is course programable. Limited to the number of course entries allowed for the weapon in the database, typically at least 20.
 
 
 ---@An entry in the custom loss table(s) used in AddCustomLoss and SideWrapper.losses.
