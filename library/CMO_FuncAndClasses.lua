@@ -293,7 +293,7 @@ local CMO__FlightplanDate = {}
 ---@field fields table @ field of this object.
 ---@field FileName string @Name of the scenario file (.scen/.save)
 ---@field FileNamePath string @ the path to folder where the current playing scenario resides. (undocumented.)
----@field GameMode number @ byte value of the current game mode? (campaign vs non campaign? editor vs non editor?)
+---@field GameMode number @ Editor mode == 2, Player mode == 0
 ---@field GameStatus number @ byte value of the current game status? (paused not paused?)
 ---@field guid string @Current scenario GUID
 ---@field HasStarted boolean @Scenario in play
