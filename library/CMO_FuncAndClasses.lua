@@ -1301,6 +1301,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field aaw_rearward_fire ? integer @0=Always Fire, 1=Fire vs Aircraft or Weapons only if interception is between shooter and target, 2=Fire vs Aircraft only if interception is between shooter and target, 3=Fire vs Weapons only if interception is between shooter and target
 ---How many different weapons need to be fired against target aircraft or target weapons or both. 'Fulfilled separately' means if two different weapons from two different units can fire at the target, they will fire to allocate the weapon salvo. If the setting is by ANY guided weapon, only one weapon type will be used. (numeric value only)
 ---@field aaw_wra_qty ? integer @0=For all targets WRA is fulfilled separately, 1=For Aircraft or Weapons WRA is fulfilled by ANY guided weapon, 2=For Aircraft WRA is fulfilled by ANY guided weapon, 3=For Weapons WRA is fulfilled by ANY guided weapon
+---@field SonobuoyUse ? integer @AutomaticForSearchAndLocalization(0), AutomaticForLocalizationOnly(1), ManualPlayerOrderOnly(2)
 
 ---A WRA Doctrine entry. Obtained\set via GetDoctrineWRA(selector) | SetDoctrineWRA(selector,WRA)
 ---When getting if .WRA is nil then it's using inherited options.  
@@ -1643,18 +1644,6 @@ function ScenEdit_AddUnit(CMO__SetUnitDescriptor) end
 ---@param CMO__LoadoutAvailable CMO__LoadoutAvailable any
 function ScenEdit_SetLoadoutAvailable(CMO__LoadoutAvailable) end
 
---- DEPRICATED: Use ScenEdit_AddUnit type='Ship' instead.
----@deprecated
-function ScenEdit_AddShip() end
---- DEPRICATED: Use ScenEdit_AddUnit type='Submarine' instead.
----@deprecated
-function ScenEdit_AddSubmarine() end
---- DEPRICATED: Use ScenEdit_AddUnit type='Aircraft' instead.
----@deprecated
-function ScenEdit_AddAircraft() end
---- DEPRICATED: Use ScenEdit_AddUnit type='Facility' instead.
----@deprecated
-function ScenEdit_AddFacility() end
 
 
 ---Adds weapons into a magazine.  
@@ -2706,15 +2695,6 @@ function UnitY() end
 function ScenEdit_UnloadCargo(fromUnit,cargoList) end
 
 
----**TOTALLY DEPRICATED*  
---- Use ScenEdit_SetEventAction() ScenEdit_SetEventCondition() ScenEdit_SetEventTrigger() instead
---- Pretty sure this is unregistered function now, pretty sure even late in CMANO release it was depricated.
----@deprecated
----Type field represents mode ADD_TRIGGER, REMOVE_TRIGGER, REPLACE_TRIGGER, ADD_CONDITION, REMOVE_CONDITION, REPLACE_CONDITION,
----ADD_ACTION, REMOVE_ACTION, REPLACE_ACTION.
----@param EventNameOrID string @ name of the event to add or remove things too.
----@param paramTable table @ {Type="themodestring",Description="NameOrIDOfTCA"}
-function ScenEdit__UpdateEvent(EventNameOrID,paramTable) end
 
 
 ---Adds,removes, or updates items on a unit.
@@ -2821,12 +2801,11 @@ function Tool_Range(startLocation,endLocation) end
 ---@param db string ?@The DB filename to create the new scenario
 function Tool_BuildBlankScenario(db) end
 
---- completely undocumented. Internal Appears to be related to resetting error conditions or managing in-game LUA editor environment??
---- hard to follow the what the delegate is actually doing.
----@param windowName string @ 
----@param mode boolean @ 
----@return boolean @ true on success false if it did nothing.
-function Tool_UIWindow(windowName,mode)end
+---Opens or closes a named UI window.
+---@param windowName string @ UI window identifier (e.g. "missioneditor")
+---@param mode boolean @ true to open, false to close
+---@return boolean @ true on success, false if it did nothing.
+function Tool_UIwindow(windowName,mode) end
 
 
 ---Export unit details to a file for later import parameters filename,filter by unit type,side
@@ -2916,9 +2895,9 @@ function Command_SaveScen(path) end
 ---@param fidelity number @0.1, 1, 5 
 function ScenEdit_SetSimulationFidelity(fidelity) end
 
----The function's purpose is to get the number of time 'ticks' based on the current game time. This is a low level counter of time past 
----@return string @The number ticks based on date/time 
-function ScenEdit_GetDateTimeTick() end
+---The function's purpose is to get the number of time 'ticks' based on the current game time. This is a low level counter of time past
+---@return string @The number ticks based on date/time
+function ScenEdit_GetDateTimeTicks() end
 
 ---Creates a window with an HTML message to allow input data from a custom HTML Form. See https://commandlua.github.io/assets/Function_UI_CallAdvancedHTMLDialog.html
 ---@param title string @Title of the document
@@ -2936,3 +2915,240 @@ function print_exc(text) end
 ---@param Longitude number @Longitude
 ---@param Altitude number ?@Altitude of the camera in meters
 function UI_SetCameraView(Latitude, Longitude,Altitude) end
+
+
+---Unpauses the simulation as if the 'play' button was pressed. PRO ONLY.
+function VP_RunSimulation() end
+
+---Pauses the simulation as if the 'pause' button was pressed. PRO ONLY.
+function VP_PauseSimulation() end
+
+---Runs the simulation for a time duration then stops. PRO ONLY.
+---@param paramTable table @ {Time="HH:MM:SS"} duration to run
+---@return string|nil @ result message or nil on error
+---Example: local msg = VP_RunForTimeAndHalt({Time="01:30:00"})
+function VP_RunForTimeAndHalt(paramTable) end
+
+---Runs the simulation to a specific date/time (UTC) then stops. PRO ONLY.
+---@param paramTable table @ {Date="DD:MM:YYYY", Time="HH:MM:SS", dateformat?="DDMMYYYY"|"MMDDYYYY"|"YYYYMMDD"}
+---@return string|nil @ result message or nil on error
+---Example: local msg = VP_RunToTimeAndHalt({Date="2.12.2007", Time="22.46.23"})
+function VP_RunToTimeAndHalt(paramTable) end
+
+
+---Line-of-sight query between two points or units.
+---@param paramTable table @ {mode, horizon, useRangeLimits?, observer={altitude|guid, location={latitude,longitude}}, target={altitude|guid, location={latitude,longitude}}}
+--- mode: 0=distance to horizon; 1=LOS is clear. horizon: 0=Radar, 1=Visual, 2=ESM
+---@return number|boolean @ distance to horizon in NM (mode 0) or LOS clear true/false (mode 1)
+---Example: Tool_LOS({mode=1, horizon=0, observer={altitude=10}, target={altitude=100}})
+function Tool_LOS(paramTable) end
+
+---Line-of-sight check between two explicit lat/lon/alt points.
+---@param from table @ {latitude, longitude, altitude} — 'alt' shorthand accepted
+---@param to table @ {latitude, longitude, altitude}
+---@param signalType number @ 0=Radar, 1=EO/IR, 2=ESM
+---@return string @ "SUCCESS" | "FAIL_BEYONDHORIZON" | "FAIL_TERRAINBLOCK"
+---Example: Tool_LOS_points({latitude='3', longitude='3', alt=3000}, {latitude='9', longitude='9', alt=3000}, 1)
+function Tool_LOS_points(from, to, signalType) end
+
+---Calculates the sensor signature of a target unit as seen by a sensing unit.
+---@param paramTable table @ {sensorunitname, targetunitname, SIGNATURETYPE}
+--- SIGNATURETYPE: "Radar_A_D"|"Radar_E_M"|"IR_Detect"|"IR_ID"|"Visual_Detect"|"Visual_ID"|"ActiveSonar"|"HullSonar_PassiveOnly_VLF"|"HullSonar_PassiveOnly_LF"|"HullSonar_PassiveOnly_MF"|"HullSonar_PassiveOnly_HF"
+---@return number @ calculated signature strength (higher = more detectable)
+---Example: Tool_QueryRCS({sensorunitname="sensorGUID", targetunitname="targetGUID", SIGNATURETYPE="Radar_E_M"})
+function Tool_QueryRCS(paramTable) end
+
+---Gets the acoustic sound level of a naval unit.
+---@param paramTable table @ {targetunitname, targetside?, frequency?} — frequency: "VLF"|"LF"|"MF"|"HF", defaults to "LF"
+---@return number @ sound level (SL) in the given band
+---Example: Tool_QuerySoundLevel({targetunitname="SSN 768 Hartford"})
+function Tool_QuerySoundLevel(paramTable) end
+
+---Clears the in-game message log.
+---@param reset boolean @ pass true to clear the log
+---@return boolean @ true if the log was cleared
+---Example: Tool_ResetMessageLog(true)
+function Tool_ResetMessageLog(reset) end
+
+---Predicts satellite coverage windows over a location within a time range.
+---@param theSatellite string @ satellite GUID or name
+---@param locationTable table @ {latitude, longitude, altitude}
+---@param timeTable table @ {startDate, startTime, duration, dateformat?} — duration format: "day:hours:minutes:seconds"
+---@param maxRange number @ range from location point in NM
+---@param minGrazingAngle number @ minimum grazing/off-zenith angle in degrees
+---@return table @ array of {start="DD:MM:YYYY HH:MM:SS", duration=seconds} coverage windows
+---Example: Tool_SatelliteCoveragePrediction("ZY-1 02D", {latitude=33.352, longitude=-162.795, altitude=0}, {startdate='11:09:2023', starttime='18:13:07', duration='2:00:00'}, 450, 95)
+function Tool_SatelliteCoveragePrediction(theSatellite, locationTable, timeTable, maxRange, minGrazingAngle) end
+
+
+---Clears all aircraft from a unit (carrier or airbase).
+---@param CMO__UnitSelector CMO__UnitSelector @ {name+side} or {guid} of the unit
+function ScenEdit_ClearAllAircraft(CMO__UnitSelector) end
+
+---Clears all unit EMCON intermittent emission configs for an entire side.
+---@param SideNameOrID string @ side name or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_ClearAllSideUnitsEmconConfigs('canada')
+function ScenEdit_ClearAllSideUnitsEmconConfigs(SideNameOrID) end
+
+---Clears all EMCON intermittent emission configs for a specific unit.
+---@param AUNameOrID string @ unit name (must be unique across scenario) or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_ClearUnitEmconConfigs('USS Ulysess')
+function ScenEdit_ClearUnitEmconConfigs(AUNameOrID) end
+
+---Creates floating text notifications at a geographic location with multiple text strings in sequence.
+---@param longitude number @ longitude of the notification location
+---@param latitude number @ latitude of the notification location
+---@param text table @ array of strings to display in sequence
+---@param R number @ red color component (0-255)
+---@param G number @ green color component (0-255)
+---@param B number @ blue color component (0-255)
+---@param moveUpward? boolean @ default true; text floats upward
+---@param fade? boolean @ default true; text fades out
+---@param lifeTime? number @ display duration in seconds (default 1)
+---@param fontSize? number @ font size (default 18)
+---@return boolean
+---Example: ScenEdit_CreateBarkNotification_Geo_Bulk(-119.1778, 46.62715, {'Line 1','Line 2'}, 255, 0, 0)
+function ScenEdit_CreateBarkNotification_Geo_Bulk(longitude, latitude, text, R, G, B, moveUpward, fade, lifeTime, fontSize) end
+
+---Copies an EMCON intermittent emission config from one side to another.
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@param SourceSideNameOrID string @ source side name or GUID
+---@param TargetSideNameOrID string @ destination side name or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_DuplicateEmconConfigToSide('green', 'canada', 'USA')
+function ScenEdit_DuplicateEmconConfigToSide(PresetAlertID, SourceSideNameOrID, TargetSideNameOrID) end
+
+---Copies an EMCON intermittent emission config from one unit to another.
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@param SourceAUNameOrID string @ source unit name (unique) or GUID
+---@param TargetAUNameOrID string @ destination unit name (unique) or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_DuplicateEmconConfigToUnit('green', 'USS Ulysess', 'USS Troy')
+function ScenEdit_DuplicateEmconConfigToUnit(PresetAlertID, SourceAUNameOrID, TargetAUNameOrID) end
+
+---Exports doctrine settings to an XML file. PRO ONLY.
+---@param paramTable table @ {side, unitname?, guid?, mission?, filename} — filename has no extension; saved to Command Defaults path
+---@return string @ doctrine as XML string
+---Example: ScenEdit_ExportDoctrineToXML({side='USA', filename='mySideDoctrine'})
+function ScenEdit_ExportDoctrineToXML(paramTable) end
+
+---Imports doctrine settings from an XML file. PRO ONLY.
+---@param paramTable table @ {side, unitname?, guid?, mission?, filename} — filename has no extension; loaded from Command Defaults path
+---@return string @ the original (pre-import) doctrine as XML string
+---Example: ScenEdit_ImportDoctrineFromXML({side='USA', filename='mySideDoctrine'})
+function ScenEdit_ImportDoctrineFromXML(paramTable) end
+
+---Returns the SHA hash of a database file. PRO ONLY.
+---@param paramTable table @ {filename} — full path and filename of the DB file
+---@return string @ SHA hash string
+---Example: ScenEdit_GetDBFileHash({filename='D:/Matrix Games/Command Modern Operations/DB/CWDB_439.db3'})
+function ScenEdit_GetDBFileHash(paramTable) end
+
+---Returns sensor data fields from the database for a given sensor DBID. PRO ONLY.
+---@param Sensor_DBID number @ sensor database ID
+---@return table @ sensor data fields from the database record
+---Example: ScenEdit_GetSensorData(1234)
+function ScenEdit_GetSensorData(Sensor_DBID) end
+
+---Gets the intermittent emission configuration for a unit at a specific EMCON alert level.
+---@param AUNameOrID string @ unit name (unique across scenario) or GUID
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@return table @ configuration table with emission interval settings and wake conditions
+---Example: ScenEdit_GetUnitIntermittentEmissionConfig('USS Ulysess', 'Green')
+function ScenEdit_GetUnitIntermittentEmissionConfig(AUNameOrID, PresetAlertID) end
+
+---Locks or unlocks the simulation fidelity and time compression controls in the UI. PRO ONLY.
+---@param IsLocked boolean @ true to lock controls, false to unlock
+function ScenEdit_LockSimulationFidelity(IsLocked) end
+
+---Merges multiple units into a single unit (the first unit in the list is kept).
+---@param unitList table @ table of unit names or GUIDs to merge
+---@return CMO__Unit @ the merged unit wrapper
+---Example: local merged = ScenEdit_MergeUnits({'Unit1', 'Unit2'})
+function ScenEdit_MergeUnits(unitList) end
+
+---Splits a unit into its component mounts as separate independent units.
+---@param CMO__UnitSelector CMO__UnitSelector @ {name?, guid?} of the unit to split
+---@return table @ array of unit wrappers, one per split component mount
+---Example: ScenEdit_SplitUnit({name='Mech Inf', guid='ff0ef686-bf03-4228-af7c-a726f8c178cf'})
+function ScenEdit_SplitUnit(CMO__UnitSelector) end
+
+---Sets the data export output rate for a specific export type. PRO ONLY.
+---@param type string @ currently only 'UnitPositions'
+---@param rate string @ "CONTINUOUS"|"1SECOND"|"2SECONDS"|"5SECONDS"|"15SECONDS"|"30SECONDS"|"1MINUTE"|"5MINUTES"|"15MINUTES"|"30MINUTES"|"1HOUR"|"6HOURS"|"12HOURS"|"24HOURS"|"MATCHSIMSPEED"
+---@return boolean @ true if successful
+---Example: ScenEdit_SetExportOutputRate('UnitPositions', '30Seconds')
+function ScenEdit_SetExportOutputRate(type, rate) end
+
+---Sets the active EMCON alert level for all units on a side.
+---@param SideNameOrID string @ side name or GUID
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@return boolean @ true if successful
+---Example: ScenEdit_SetSideEmconAlertness("Canada", "red")
+function ScenEdit_SetSideEmconAlertness(SideNameOrID, PresetAlertID) end
+
+---Transfers specified mounts from one unit to another.
+---@param fromUnit string @ source unit name or GUID
+---@param toUnit string @ destination unit name or GUID
+---@param mountGuids table @ array of mount GUIDs to transfer
+---@return boolean
+---Example: ScenEdit_TransferMount('Source Unit', 'Target Unit', {'mount-guid-1','mount-guid-2'})
+function ScenEdit_TransferMount(fromUnit, toUnit, mountGuids) end
+
+---Converts a zone from one type to another.
+---@param SideNameOrID string @ side name/GUID owning the zone; use 'Nature' for custom environment zones
+---@param ZoneNameOrID string @ zone name or GUID
+---@param TargetType string @ "exclusion"|"nonav"|"standard"|"customenvironment"
+---@return string @ empty string "" on success, error message on failure
+---Example: ScenEdit_TransformZone('sidea', 'no-go zone', 'exclusion')
+function ScenEdit_TransformZone(SideNameOrID, ZoneNameOrID, TargetType) end
+
+---Enables or disables a named realism/simulation setting.
+---@param RealismSettingString string @ realism setting enum name (e.g. "DetailedGunFireControl")
+---@param enabled boolean @ true to enable, false to disable
+---@return boolean @ true if the setting name is valid
+---Example: ScenEdit_UpdateRSetting("DetailedGunFireControl", true)
+function ScenEdit_UpdateRSetting(RealismSettingString, enabled) end
+
+---Returns the current weapon allocation for a unit against a contact.
+---@param attackerID string @ attacking unit GUID; pass nil to query all shooters on a side
+---@param contactId string @ contact GUID being attacked
+---@param attackingSideID? string @ [optional] attacking side GUID; used when attackerID is nil
+---@return table @ array of {shooter, qtyAssigned, weapon, weaponName, target, qtyFired}
+---Example: ScenEdit_WeaponAllocation('attackerGUID', 'contactGUID')
+function ScenEdit_WeaponAllocation(attackerID, contactId, attackingSideID) end
+
+
+---Sets a value in the event exporter configuration (e.g. Tacview).
+---Category and Setting are case-sensitive. Stored in Config\EventExport.ini.
+---Tacview category available in all editions; other categories require PRO.
+---@param Category string @ exporter category (e.g. 'Tacview Settings')
+---@param Setting string @ parameter name (e.g. 'UseCustomUnitExportFrequency')
+---@param Value string @ value to set
+---Example: Exporter_SetSetting('Tacview Settings', 'UseCustomUnitExportFrequency', 'False')
+function Exporter_SetSetting(Category, Setting, Value) end
+
+
+---Shows a simple dialog with custom buttons and returns the label of the button pressed.
+---@param title string @ dialog box title
+---@param description string @ dialog body message
+---@param interactions table @ array of button label strings
+---@return string @ label of the button pressed by the user
+---Example: local choice = UI_CallAdvancedDialog("Select", "Choose one:", {"Option A","Option B","Cancel"})
+function UI_CallAdvancedDialog(title, description, interactions) end
+
+---Opens the database viewer window for a specific platform or weapon record.
+---@param SelectedObjectType string @ "Aircraft"|"Ship"|"Submarine"|"Facility"|"Ground Unit"|"Satellite"|"Weapon"|"Sensor"
+---@param SelectedObjectID number @ database ID of the object
+---Example: UI_OpenNewDatabaseWindow("aircraft", 10)
+function UI_OpenNewDatabaseWindow(SelectedObjectType, SelectedObjectID) end
+
+---Prompts the user to select units from one or more specified sides.
+---@param paramTable table @ selection parameters (undocumented)
+function UI_SelectUnitsPrompt_FromSides(paramTable) end
+
+---Prompts the user to select units from the player's own side.
+---@param paramTable table @ selection parameters (undocumented)
+function UI_SelectUnitsPrompt_OwnSide(paramTable) end
