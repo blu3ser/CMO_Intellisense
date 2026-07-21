@@ -76,7 +76,7 @@ CMO version at time: 1.05.1309.10
 ---@field addasacell? boolean @Default true. If false, add only one weapon to a cell
 
 ---@class CMO__TargetInformation:table @Target information for units
----@field CMO_Contact @ The Contact information of the unit
+---@field CMO_Contact CMO__Contact@ The Contact information of the unit
 ---@class CMO__Enum_Table:table @ definitions for _enumTable_ global taken from .net LuaEnuNames
 ---@field Altitude table @ table of altitude presets [enum]=stringname
 ---@field Condition_Air table @ table of possible conditions for air units. [enum]=stringname
@@ -293,7 +293,7 @@ local CMO__FlightplanDate = {}
 ---@field fields table @ field of this object.
 ---@field FileName string @Name of the scenario file (.scen/.save)
 ---@field FileNamePath string @ the path to folder where the current playing scenario resides. (undocumented.)
----@field GameMode number @ byte value of the current game mode? (campaign vs non campaign? editor vs non editor?)
+---@field GameMode number @ Editor mode == 2, Player mode == 0
 ---@field GameStatus number @ byte value of the current game status? (paused not paused?)
 ---@field guid string @Current scenario GUID
 ---@field HasStarted boolean @Scenario in play
@@ -352,6 +352,8 @@ function CMO__Scenario:ResetScore() end
 ---@field firingAt table @Table of contact guids that this contact is firing at.
 ---(Note that the starting idex of this table is '0' rather than '1' as normal Lua tables23232)  
 ---@field firedOn table @Table of guids that are firing on this contact.
+---@field observer CMO__Side @ Original detecting side; nil if same as requesting side (shared contact) [READ ONLY]
+---@field observer_posture string @ Posture letter from the perspective of the original detector of this contact
 ---@type CMO__Contact
 
 ---@class CMO_Contact
@@ -428,6 +430,12 @@ function CMO__Contact:inArea(area) end
 ---@field losses table @Table of losses to date - {type, dbid, name, number}.
 ---@field expenditures table @Table of expenditure to date - {type, dbid, name, number}.
 ---@field missions table @Table of Mission wrappers for missions on the side.
+---@field doctrine CMO__Doctrine @ Side doctrine [READ ONLY]
+---@field collectiveResponsibility boolean @ Collective Responsibility setting
+---@field computerControlledOnly boolean @ AI controlled only (no human player)
+---@field canAutoTrackCivillians boolean @ Auto-track civilians
+---@field Chalks table @ Table of Serials within the Chalk [READ ONLY]
+---@field Operation table @ Operation planner wrapper [READ ONLY]
 ---@type CMO__Side
 
 ---@class CMO__Side
@@ -527,6 +535,35 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field OnDeactivateUnassign? boolean @ When mission is deactivate unassign the units
 ---@field OnDeactivateRTB? boolean @ When mission is deactivate, units RTB
 ---@field OnDeactivateDelete? boolean @ When mission is deactivate, delete mission
+---@field doctrine? CMO__Doctrine @ Mission-level doctrine override [READ ONLY]
+---@field assignedCargo? table @ CargoItems assigned to be transported by this mission [READ ONLY]
+---@field PriorityWeight? integer @ Operation Planner priority (lower = higher priority)
+---@field OperationName? string @ Groups this mission under a named operation in the Operation Planner UI
+---@field Completion? number @ 0.0–1.0 estimated mission completion fraction
+---@field Phase? number @ Operation Planner phase: Auto=0, Active=20, OnHold=30, Completed=10, None=9999
+---@field MissionStartTrigger_Time? integer @ H+/- offset in seconds for the time-based start trigger
+---@field MissionStartTrigger_Time_Enabled? boolean
+---@field MissionStartTrigger_Time_LastResult? boolean
+---@field MissionStartTrigger_Time_Operator? boolean @ true = AND with other triggers, false = OR
+---@field MissionStartTrigger_MissionCompleted? table @ GUIDs of missions that must complete to satisfy trigger
+---@field MissionStartTrigger_MissionCompleted_Enabled? boolean
+---@field MissionStartTrigger_MissionCompleted_LastResult? boolean
+---@field MissionStartTrigger_MissionCompleted_Operator? boolean
+---@field MissionStartTrigger_LUADescription? string @ Label shown in UI for the Lua start trigger
+---@field MissionStartTrigger_LUA? string @ Lua snippet; must return a boolean
+---@field MissionStartTrigger_LUA_Enabled? boolean
+---@field MissionStartTrigger_LUA_LastResult? boolean
+---@field MissionStartTrigger_LUA_Operator? boolean
+---@field MissionCompletedTrigger_ElapsedTime? integer @ Seconds since mission activation for the completion trigger
+---@field MissionCompletedTrigger_ElapsedTime_Current? integer @ Current elapsed seconds [READ ONLY]
+---@field MissionCompletedTrigger_ElapsedTime_Enabled? boolean
+---@field MissionCompletedTrigger_ElapsedTime_LastResult? boolean
+---@field MissionCompletedTrigger_ElapsedTime_Operator? boolean
+---@field MissionCompletedTrigger_LUADescription? string
+---@field MissionCompletedTrigger_LUA? string @ Lua snippet; must return a boolean
+---@field MissionCompletedTrigger_LUA_Enabled? boolean
+---@field MissionCompletedTrigger_LUA_LastResult? boolean
+---@field MissionCompletedTrigger_LUA_Operator? boolean
 
 
 
@@ -543,6 +580,37 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field FuelQtyToStartLookingForTanker_airborne number? @Percentage of fuel (0-100) where units on this mission start trying to refuel.
 ---@field TankerMaxDistance_airborne string|number? @ or number Use 'internal' or set a range. The code will match the lowest availble setting
 ---@field TankerFollowsReceivers boolean? @ undocumented.
+---@field KeepOnMissionWithoutTankersInPlace boolean? @ If true, units ignore bingo status and continue on mission waiting for a tanker (use only with flight plans)
+
+---@class CMO__Mission
+local CMO__Mission = {}
+---Add a non-mount cargo item to the mission's assigned cargo list.
+---@param CargoObjectType number @ CMO__Constants.CargoType code
+---@param dbid number @ database ID of the cargo item
+---@param guid? string @ specific unit GUID or empty string for any
+---@return table
+function CMO__Mission:addAssignedCargo(CargoObjectType, dbid, guid) end
+---Remove a non-mount cargo item from the mission's assigned cargo list.
+---@param CargoObjectType number @ CMO__Constants.CargoType code
+---@param dbid number @ database ID
+---@param guid? string @ specific unit GUID or empty string
+---@return table
+function CMO__Mission:removeAssignedCargo(CargoObjectType, dbid, guid) end
+---Add a mount cargo item (by db ID and quantity) to the mission's assigned cargo list.
+---@param dbid number @ mount database ID
+---@param quantity number @ number of mounts to add
+---@return table
+function CMO__Mission:addAssignedCargoMount(dbid, quantity) end
+---Remove a mount cargo item from the mission's assigned cargo list.
+---@param dbid number @ mount database ID
+---@param quantity number @ number of mounts to remove
+---@return table
+function CMO__Mission:removeAssignedCargoMount(dbid, quantity) end
+---Generate or regenerate the mission's flight plans.
+---@param options? table
+function CMO__Mission:createFlightPlans(options) end
+---Recalculate waypoint ETAs after manually editing waypoints.
+function CMO__Mission:updateWPtimes() end
 
 
 
@@ -589,6 +657,19 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field BoatsToInvestigate string
 ---@field BoatsToEngage string
 ---@field GroupMemberEngageDistance string
+---@field LoopType string|number @ Movement style: Random(0), RepeatingLoop(1), ChainsawLoop(2)
+---@field TransitAltitudePreset? string @ Altitude preset name to use for transit
+---@field UseTransitAltitudePreset? boolean @ Apply the transit altitude preset
+---@field StationAltitudePreset? string @ Altitude preset name to use on station
+---@field UseStationAltitudePreset? boolean @ Apply the station altitude preset
+---@field AttackAltitudePreset? string @ Altitude preset name to use for attack
+---@field UseAttackAltitudePreset? boolean @ Apply the attack altitude preset
+---@field TransitDepthSubmarinePreset? string @ Depth preset name for submarine transit
+---@field UseTransitDepthSubmarinePreset? boolean
+---@field StationDepthSubmarinePreset? string @ Depth preset name for submarine on station
+---@field UseStationDepthSubmarinePreset? boolean
+---@field AttackDepthSubmarinePreset? string @ Depth preset name for submarine attack
+---@field UseAttackDepthSubmarinePreset? boolean
 
 
 
@@ -625,6 +706,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field BoatsToInvestigate string @number of boats to investigate unknown contacts.
 ---@field BoatsToEngage string @number of boats to engage targets.
 ---@field GroupMemberEngageDistance string  @ship\other equivlent to WingmanEngageDistance.
+---@field PrePlannedOnly boolean @ True: mission RTBs once the target is destroyed (alias for StrikePreplan)
+---@field FocusOnStrike boolean @ True: focus entirely on striking targets, ignoring other tasking
 
 
 
@@ -674,6 +757,11 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field UseGroupSize? boolean @ applies to ships
 ---@field Zone table @Table of reference point names and/or GUIDs
 ---@field Armingdelay string @time In format of 'days:hours:minutes:seconds' e.g. 1 day, 4 hours, 30 minutes would be '1:4:30:0'
+---@field MinesLaidInSet? number @ Number of mines laid per group; nil means lay all at once
+---@field MinesLaidInterval? number @ Meters between individual mines; nil means use safe distance
+---@field MinesLaidSetInterval? number @ Meters between groups of mines; nil means no interval
+---@field MinesLaidMethod? number @ Deployment pattern: Line(0) or Random(1)
+---@field LoopType? string|number @ ContinuousLoop(0) or SingleLoop(1) for the mine-clear pattern
 
 
 
@@ -716,6 +804,14 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field ActiveEMCON string  @ 'inherit' or true|false boolean to Activate EMCON inside zone\path\track only.
 ---@field TankerOneTime string  @ 'inherit' or true|false boolean to Allow tankers only do one refueling per flight.
 ---@field TankerMaxReceivers string @ 'inherit', or value.
+---@field TransitAltitudePreset? string @ Altitude preset name for transit
+---@field UseTransitAltitudePreset? boolean
+---@field StationAltitudePreset? string @ Altitude preset name on station
+---@field UseStationAltitudePreset? boolean
+---@field TransitDepthSubmarinePreset? string @ Depth preset name for submarine transit
+---@field UseTransitDepthSubmarinePreset? boolean
+---@field StationDepthSubmarinePreset? string @ Depth preset name for submarine on station
+---@field UseStationDepthSubmarinePreset? boolean
 
 
 
@@ -828,6 +924,8 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field extratime? number @ The penalty time (minutes) to apply to the aircraft on reaching quick turnaround.
 ---@field airborne? number @ Total airborne time (seconds) while in quick turnaround mode.
 ---@field avgsortietime? number @ Average sortie time while in quick turnaround mode.
+---@field reset? boolean @ When setting: resets sorties/airborne counters as if just entering quick turnaround mode.
+---@field avgsortietime? number @ Average sortie time while in quick turnaround mode.
 ---@field reset? boolean @ When setting unit quick turnaround, adding this parameter will reset the above numbers as if just starting in quick turnaround mode.
 
 ---@class CMO__LoadoutAvailable:table @LoadoutAvailable
@@ -932,7 +1030,28 @@ function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 ---@field pitch number @ the current pitch of the unit as a floating point number (aircraft or munition).
 ---@field roll number @The unit roll as a floating point number (aircraft)
 ---@field groundspeed number @ the current groundspeed of the unit as a float.
----@field quickTurnaround CMO__Quickturnaround @Current quick turnaround values if an aircraft with a loadout 
+---@field doctrine CMO__Doctrine @ Effective doctrine for this unit [READ ONLY]
+---@field loadout CMO__Loadout @ Current aircraft loadout wrapper [READ ONLY]
+---@field signature CMO__Signature @ Unit signature profile; nil if not applicable [READ ONLY]
+---@field noiseLevel table @ Noise levels {front, side, rear}; nil if not applicable [READ ONLY]
+---@field groupLead string|CMO__Unit @ Current group lead unit; set by name or GUID to reassign
+---@field IsDestroyed boolean @ True if the unit is destroyed but object not yet purged [READ ONLY]
+---@field isSinking boolean @ True if ship is sinking (still listed as active) [READ ONLY]
+---@field IsLoadedAsCargo boolean @ True if unit is being transported as cargo [READ ONLY]
+---@field beingPickedUp boolean @ True if unit is queued to be picked up [READ ONLY]
+---@field pickedUpBy string @ GUID of the unit carrying this unit [READ ONLY]
+---@field pickUpTarget CMO__Unit @ The unit being picked up by this unit [READ ONLY]
+---@field AssignedMissionsQueue table @ List of mission GUIDs queued by the Operation Planner
+---@field desiredAltitude number @ Desired altitude the unit is moving toward
+---@field desiredSpeed number @ Desired speed the unit is moving toward
+---@field desiredHeading number @ Desired heading the unit is moving toward
+---@field desiredPitch number @ Desired pitch (controllable units only, else nil)
+---@field desiredRoll number @ Desired roll
+---@field currentExhaustion number @ Seconds accumulated toward exhaustion [READ ONLY]
+---@field maxExhaustion number @ Maximum seconds before exhaustion occurs [READ ONLY]
+---@field manualThrottle string|number @ Manual throttle override: preset name or numeric code
+---@field moveto table @ Move the unit to {latitude, longitude, altitude}
+---@field quickTurnaround CMO__Quickturnaround @Current quick turnaround values if an aircraft with a loadout
 ---@type CMO__Unit
 
 ---@class CMO_Unit
@@ -978,6 +1097,35 @@ function CMO__Unit:inArea(area) end
 ---Update the orbit for a satellite by specifying a TLE. See below for a complete usage example.
 ---@param TLE table @ table containing TLE formated data {TLE='tle data here'}.
 function CMO__Unit:updateorbit(TLE) end
+---Return a waypoint by GUID.
+---@param guid string @ GUID of the waypoint
+---@return CMO__Waypoint|nil
+function CMO__Unit:getwaypoint(guid) end
+---Send unit to replenish fuel/weapons.
+---@param options? table @ optional {tanker=GUID, mission={...}}
+---@return table @ {success, reason}
+function CMO__Unit:ReplenishUnit(options) end
+---Create a cargo item in this unit's cargo bay.
+---@param type number @ cargo type code
+---@param dbid number @ database ID of the cargo unit
+---@param customname? string @ optional custom name
+---@return CMO__CargoItem
+function CMO__Unit:createUnitCargo(type, dbid, customname) end
+---Delete a cargo item from the unit's bay.
+---@param guid string @ GUID of the cargo item
+---@return boolean
+function CMO__Unit:deleteUnitCargo(guid) end
+---Get a cargo item by its GUID.
+---@param guid string @ GUID of the cargo item
+---@return CMO__CargoItem|nil
+function CMO__Unit:getUnitCargo(guid) end
+---Deploy or retract the unit's dipping sonar.
+---@param deploy boolean @ true to deploy, false to retract
+function CMO__Unit:deployDippingSonar(deploy) end
+---Drop a sonobuoy.
+---@param active boolean @ true for active, false for passive
+---@param shallow boolean @ true to drop above the layer, false for below
+function CMO__Unit:dropSonobuoy(active, shallow) end
 ---theSat = ScenEdit_GetUnit({guid='56f830c1-d0e2-430a-985e-0e301cc01eff'})  
 ---theTLE = 'Resurs P1\n1 39186U 13030A 17013.12537468 .00000446 00000-0 16942-4 0 9992\n2 39186 97.3847 79.3911 0015157 247.7411 195.8488 15.31966970198820'  
 ---theSat:updateorbit({TLE=theTLE})
@@ -1188,6 +1336,8 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field shooter_salvo? string|integer @Shooters per salvo ('system','max','inherit' or a number)
 ---@field firing_range? string @Firing range ('max','none','inherit' or a number)
 ---@field self_defence? string @Self-defence range ('system','max','none','inherit') or a number)
+---@field weapon_dbid? string @ Weapon database ID [READ ONLY]
+---@field weapon_name? string @ Weapon name [READ ONLY]
 
 
 ---If nil then weapon record doesn't exist on the unit.  Each field if nil means it's using inherited values.  
@@ -1261,6 +1411,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field engaging_ambiguous_targets ? number @Ignore(0), Optimistic(1), or Pessimistic(2)
 ---@field automatic_evasion ? boolean @True if the unit should automatically evade
 ---@field maintain_standoff ? boolean @True if the unit should try to avoid approaching its target, only valid for ships
+---@field bingo_threshold ? boolean @0 Bingo 30%, 1 Bingo 40%, 2 Bingo 50%, 3 Bingo 60%, 4 Bingo 70%, 5 Bingo 80%
 ---@field use_refuel_unrep ? number @Always_ExceptTankersRefuellingTankers(0), Never(1), Always_IncludingTankersRefuellingTankers(2)
 ---@field engage_opportunity_targets ? boolean @True if the unit should take opportunistic shots
 ---@field use_sams_in_anti_surface_mode ? boolean @True if SAMs should be used to engage surface targets
@@ -1286,14 +1437,39 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field use_aip ? string @No(0), Yes_AttackOnly(1), Yes_Always(2)
 ---@field dipping_sonar ? string @Automatically_HoverAnd150ft(0), ManualAndMissionOnly(1)
 ---@field bvr_logic ? string @StraightIn(0), Crank(1), Drag(2)
----@field withdraw_on_damage ? string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
----@field withdraw_on_fuel ? string @Ignore(0), Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
----@field withdraw_on_attack ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field withdraw_on_defence ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field deploy_on_damage ? string @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
----@field deploy_on_fuel ? string @Ignore(0) Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
----@field deploy_on_attack ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
----@field deploy_on_defence ? string @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field withdraw_on_damage ? string|integer @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
+---@field withdraw_on_fuel ? string|integer @Ignore(0), Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
+---@field withdraw_on_attack ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field withdraw_on_defence ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field deploy_on_damage ? string|integer @Ignore(0), Percent5(1), Percent25(2), Percent50(3), Percent75(4)
+---@field deploy_on_fuel ? string|integer @Ignore(0) Bingo(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5)
+---@field deploy_on_attack ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---@field deploy_on_defence ? string|integer @Ignore(0), Exhausted(1), Percent25(2), Percent50(3), Percent75(4), Percent100(5), LoadFullWeapons(6)
+---'drop guidance' -> the firing platform will drop guidance when it becomes impossible for the guided missile to intercept the target. This can allow a following weapon to make the intercept, or the firing platform to fire another shot, as it frees up the guidance system. (numeric value only)
+---@field aaw_guidance ? integer @0=Always Continue Guidance, 1=Drop Guidance
+---'Rearward' is based on the heading of the target -- if the target is heading away from the firing platform then it is 'to the rear'. Imagine a line perpendicular to the heading of the incoming target -- if the target goes 'behind' this line OR if the intercept point is behind this line, then the firing platform will drop the target. Can apply to aircraft and missile targets or just aircraft or just missiles, depending on the option chosen. (numeric value only)
+---@field aaw_rearward_fire ? integer @0=Always Fire, 1=Fire vs Aircraft or Weapons only if interception is between shooter and target, 2=Fire vs Aircraft only if interception is between shooter and target, 3=Fire vs Weapons only if interception is between shooter and target
+---How many different weapons need to be fired against target aircraft or target weapons or both. 'Fulfilled separately' means if two different weapons from two different units can fire at the target, they will fire to allocate the weapon salvo. If the setting is by ANY guided weapon, only one weapon type will be used. (numeric value only)
+---@field aaw_wra_qty ? integer @0=For all targets WRA is fulfilled separately, 1=For Aircraft or Weapons WRA is fulfilled by ANY guided weapon, 2=For Aircraft WRA is fulfilled by ANY guided weapon, 3=For Weapons WRA is fulfilled by ANY guided weapon
+---@field SonobuoyUse ? integer @AutomaticForSearchAndLocalization(0), AutomaticForLocalizationOnly(1), ManualPlayerOrderOnly(2)
+---@field TargetPriority? table @ Target priority list [READ ONLY]; modify via addTargetPriorityEntry/deleteTargetPriorityEntry
+---@field ThreatMaxDist? number @ Max range (NM) within which an inbound weapon is tracked as a threat; weapons beyond this distance are ignored
+---@field StrikeMemberFocus? number @ Strike member targeting focus: OpportunityScrambling(0), FocusOnMissionTargets(1)
+
+---@class CMO__Doctrine
+local CMO__Doctrine = {}
+---Add an entry to the doctrine target priority list.
+---@param unit_type number @ general unit type (0 = any)
+---@param unit_subtype number @ unit subtype code (0 = any)
+---@param isfixedfacilitysubtype boolean @ true if unit_subtype refers to a fixed facility category
+---@param dbid number @ database ID of the unit class (0 = any)
+---@param listIndex number @ position in the priority list (1-based)
+---@return table @ updated TargetPriority list
+function CMO__Doctrine:addTargetPriorityEntry(unit_type, unit_subtype, isfixedfacilitysubtype, dbid, listIndex) end
+---Delete an entry from the doctrine target priority list.
+---@param listIndex number @ 1-based position to delete
+---@return table @ updated TargetPriority list
+function CMO__Doctrine:deleteTargetPriorityEntry(listIndex) end
 
 ---A WRA Doctrine entry. Obtained\set via GetDoctrineWRA(selector) | SetDoctrineWRA(selector,WRA)
 ---When getting if .WRA is nil then it's using inherited options.  
@@ -1412,12 +1588,12 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 ---@class CMO__AttackOptions @ attack options table to use with AttackContact()
 ---@field mode string|number @Targeting mode "AutoTargeted"|"0", "ManualWeaponAlloc"|"1","ManualTargeted"|"2"   (Defaults to AutoTageted.) Use 2 for BOL, and|or mount options.
----@field mount number @If used The attackers mount DBID or 0 for loadout mount. (default to loadout if not specified)
----@field weapon number @The attackers weapon DBID (ai choses weapon if not specified, typically based on WRA.)
----@field qty number @How many to allocate (ai choses number based on WRA if not specified )
----@field latitude number @ If BOL used, the latitude to attack.
----@field longitude number @ If BOL used, the longitude to attack.
----@field course CMO__TableOfWaypoints @ If BOL use, a table of waypoints representing the course the weapon should use IF the weapon is course programable. Limited to the number of course entries allowed for the weapon in the database, typically at least 20.
+---@field mount? number @If used The attackers mount DBID or 0 for loadout mount. (default to loadout if not specified)
+---@field weapon? number @The attackers weapon DBID (ai choses weapon if not specified, typically based on WRA.)
+---@field qty? number @How many to allocate (ai choses number based on WRA if not specified )
+---@field latitude? number @ If BOL used, the latitude to attack.
+---@field longitude? number @ If BOL used, the longitude to attack.
+---@field course? CMO__TableOfWaypoints @ If BOL use, a table of waypoints representing the course the weapon should use IF the weapon is course programable. Limited to the number of course entries allowed for the weapon in the database, typically at least 20.
 
 
 ---@An entry in the custom loss table(s) used in AddCustomLoss and SideWrapper.losses.
@@ -1637,18 +1813,6 @@ function ScenEdit_AddUnit(CMO__SetUnitDescriptor) end
 ---@param CMO__LoadoutAvailable CMO__LoadoutAvailable any
 function ScenEdit_SetLoadoutAvailable(CMO__LoadoutAvailable) end
 
---- DEPRICATED: Use ScenEdit_AddUnit type='Ship' instead.
----@deprecated
-function ScenEdit_AddShip() end
---- DEPRICATED: Use ScenEdit_AddUnit type='Submarine' instead.
----@deprecated
-function ScenEdit_AddSubmarine() end
---- DEPRICATED: Use ScenEdit_AddUnit type='Aircraft' instead.
----@deprecated
-function ScenEdit_AddAircraft() end
---- DEPRICATED: Use ScenEdit_AddUnit type='Facility' instead.
----@deprecated
-function ScenEdit_AddFacility() end
 
 
 ---Adds weapons into a magazine.  
@@ -2700,15 +2864,6 @@ function UnitY() end
 function ScenEdit_UnloadCargo(fromUnit,cargoList) end
 
 
----**TOTALLY DEPRICATED*  
---- Use ScenEdit_SetEventAction() ScenEdit_SetEventCondition() ScenEdit_SetEventTrigger() instead
---- Pretty sure this is unregistered function now, pretty sure even late in CMANO release it was depricated.
----@deprecated
----Type field represents mode ADD_TRIGGER, REMOVE_TRIGGER, REPLACE_TRIGGER, ADD_CONDITION, REMOVE_CONDITION, REPLACE_CONDITION,
----ADD_ACTION, REMOVE_ACTION, REPLACE_ACTION.
----@param EventNameOrID string @ name of the event to add or remove things too.
----@param paramTable table @ {Type="themodestring",Description="NameOrIDOfTCA"}
-function ScenEdit__UpdateEvent(EventNameOrID,paramTable) end
 
 
 ---Adds,removes, or updates items on a unit.
@@ -2815,12 +2970,11 @@ function Tool_Range(startLocation,endLocation) end
 ---@param db string ?@The DB filename to create the new scenario
 function Tool_BuildBlankScenario(db) end
 
---- completely undocumented. Internal Appears to be related to resetting error conditions or managing in-game LUA editor environment??
---- hard to follow the what the delegate is actually doing.
----@param windowName string @ 
----@param mode boolean @ 
----@return boolean @ true on success false if it did nothing.
-function Tool_UIWindow(windowName,mode)end
+---Opens or closes a named UI window.
+---@param windowName string @ UI window identifier (e.g. "missioneditor")
+---@param mode boolean @ true to open, false to close
+---@return boolean @ true on success, false if it did nothing.
+function Tool_UIwindow(windowName,mode) end
 
 
 ---Export unit details to a file for later import parameters filename,filter by unit type,side
@@ -2910,9 +3064,9 @@ function Command_SaveScen(path) end
 ---@param fidelity number @0.1, 1, 5 
 function ScenEdit_SetSimulationFidelity(fidelity) end
 
----The function's purpose is to get the number of time 'ticks' based on the current game time. This is a low level counter of time past 
----@return string @The number ticks based on date/time 
-function ScenEdit_GetDateTimeTick() end
+---The function's purpose is to get the number of time 'ticks' based on the current game time. This is a low level counter of time past
+---@return string @The number ticks based on date/time
+function ScenEdit_GetDateTimeTicks() end
 
 ---Creates a window with an HTML message to allow input data from a custom HTML Form. See https://commandlua.github.io/assets/Function_UI_CallAdvancedHTMLDialog.html
 ---@param title string @Title of the document
@@ -2930,3 +3084,292 @@ function print_exc(text) end
 ---@param Longitude number @Longitude
 ---@param Altitude number ?@Altitude of the camera in meters
 function UI_SetCameraView(Latitude, Longitude,Altitude) end
+
+
+---Unpauses the simulation as if the 'play' button was pressed. PRO ONLY.
+function VP_RunSimulation() end
+
+---Pauses the simulation as if the 'pause' button was pressed. PRO ONLY.
+function VP_PauseSimulation() end
+
+---Runs the simulation for a time duration then stops. PRO ONLY.
+---@param paramTable table @ {Time="HH:MM:SS"} duration to run
+---@return string|nil @ result message or nil on error
+---Example: local msg = VP_RunForTimeAndHalt({Time="01:30:00"})
+function VP_RunForTimeAndHalt(paramTable) end
+
+---Runs the simulation to a specific date/time (UTC) then stops. PRO ONLY.
+---@param paramTable table @ {Date="DD:MM:YYYY", Time="HH:MM:SS", dateformat?="DDMMYYYY"|"MMDDYYYY"|"YYYYMMDD"}
+---@return string|nil @ result message or nil on error
+---Example: local msg = VP_RunToTimeAndHalt({Date="2.12.2007", Time="22.46.23"})
+function VP_RunToTimeAndHalt(paramTable) end
+
+
+---Line-of-sight query between two points or units.
+---@param paramTable table @ {mode, horizon, useRangeLimits?, observer={altitude|guid, location={latitude,longitude}}, target={altitude|guid, location={latitude,longitude}}}
+--- mode: 0=distance to horizon; 1=LOS is clear. horizon: 0=Radar, 1=Visual, 2=ESM
+---@return number|boolean @ distance to horizon in NM (mode 0) or LOS clear true/false (mode 1)
+---Example: Tool_LOS({mode=1, horizon=0, observer={altitude=10}, target={altitude=100}})
+function Tool_LOS(paramTable) end
+
+---Line-of-sight check between two explicit lat/lon/alt points.
+---@param from table @ {latitude, longitude, altitude} — 'alt' shorthand accepted
+---@param to table @ {latitude, longitude, altitude}
+---@param signalType number @ 0=Radar, 1=EO/IR, 2=ESM
+---@return string @ "SUCCESS" | "FAIL_BEYONDHORIZON" | "FAIL_TERRAINBLOCK"
+---Example: Tool_LOS_points({latitude='3', longitude='3', alt=3000}, {latitude='9', longitude='9', alt=3000}, 1)
+function Tool_LOS_points(from, to, signalType) end
+
+---Calculates the sensor signature of a target unit as seen by a sensing unit.
+---@param paramTable table @ {sensorunitname, targetunitname, SIGNATURETYPE}
+--- SIGNATURETYPE: "Radar_A_D"|"Radar_E_M"|"IR_Detect"|"IR_ID"|"Visual_Detect"|"Visual_ID"|"ActiveSonar"|"HullSonar_PassiveOnly_VLF"|"HullSonar_PassiveOnly_LF"|"HullSonar_PassiveOnly_MF"|"HullSonar_PassiveOnly_HF"
+---@return number @ calculated signature strength (higher = more detectable)
+---Example: Tool_QueryRCS({sensorunitname="sensorGUID", targetunitname="targetGUID", SIGNATURETYPE="Radar_E_M"})
+function Tool_QueryRCS(paramTable) end
+
+---Gets the acoustic sound level of a naval unit.
+---@param paramTable table @ {targetunitname, targetside?, frequency?} — frequency: "VLF"|"LF"|"MF"|"HF", defaults to "LF"
+---@return number @ sound level (SL) in the given band
+---Example: Tool_QuerySoundLevel({targetunitname="SSN 768 Hartford"})
+function Tool_QuerySoundLevel(paramTable) end
+
+---Clears the in-game message log.
+---@param reset boolean @ pass true to clear the log
+---@return boolean @ true if the log was cleared
+---Example: Tool_ResetMessageLog(true)
+function Tool_ResetMessageLog(reset) end
+
+---Predicts satellite coverage windows over a location within a time range.
+---@param theSatellite string @ satellite GUID or name
+---@param locationTable table @ {latitude, longitude, altitude}
+---@param timeTable table @ {startDate, startTime, duration, dateformat?} — duration format: "day:hours:minutes:seconds"
+---@param maxRange number @ range from location point in NM
+---@param minGrazingAngle number @ minimum grazing/off-zenith angle in degrees
+---@return table @ array of {start="DD:MM:YYYY HH:MM:SS", duration=seconds} coverage windows
+---Example: Tool_SatelliteCoveragePrediction("ZY-1 02D", {latitude=33.352, longitude=-162.795, altitude=0}, {startdate='11:09:2023', starttime='18:13:07', duration='2:00:00'}, 450, 95)
+function Tool_SatelliteCoveragePrediction(theSatellite, locationTable, timeTable, maxRange, minGrazingAngle) end
+
+
+---Clears all aircraft from a unit (carrier or airbase).
+---@param CMO__UnitSelector CMO__UnitSelector @ {name+side} or {guid} of the unit
+function ScenEdit_ClearAllAircraft(CMO__UnitSelector) end
+
+---Clears all unit EMCON intermittent emission configs for an entire side.
+---@param SideNameOrID string @ side name or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_ClearAllSideUnitsEmconConfigs('canada')
+function ScenEdit_ClearAllSideUnitsEmconConfigs(SideNameOrID) end
+
+---Clears all EMCON intermittent emission configs for a specific unit.
+---@param AUNameOrID string @ unit name (must be unique across scenario) or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_ClearUnitEmconConfigs('USS Ulysess')
+function ScenEdit_ClearUnitEmconConfigs(AUNameOrID) end
+
+---Creates floating text notifications at a geographic location with multiple text strings in sequence.
+---@param longitude number @ longitude of the notification location
+---@param latitude number @ latitude of the notification location
+---@param text table @ array of strings to display in sequence
+---@param R number @ red color component (0-255)
+---@param G number @ green color component (0-255)
+---@param B number @ blue color component (0-255)
+---@param moveUpward? boolean @ default true; text floats upward
+---@param fade? boolean @ default true; text fades out
+---@param lifeTime? number @ display duration in seconds (default 1)
+---@param fontSize? number @ font size (default 18)
+---@return boolean
+---Example: ScenEdit_CreateBarkNotification_Geo_Bulk(-119.1778, 46.62715, {'Line 1','Line 2'}, 255, 0, 0)
+function ScenEdit_CreateBarkNotification_Geo_Bulk(longitude, latitude, text, R, G, B, moveUpward, fade, lifeTime, fontSize) end
+
+---Copies an EMCON intermittent emission config from one side to another.
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@param SourceSideNameOrID string @ source side name or GUID
+---@param TargetSideNameOrID string @ destination side name or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_DuplicateEmconConfigToSide('green', 'canada', 'USA')
+function ScenEdit_DuplicateEmconConfigToSide(PresetAlertID, SourceSideNameOrID, TargetSideNameOrID) end
+
+---Copies an EMCON intermittent emission config from one unit to another.
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@param SourceAUNameOrID string @ source unit name (unique) or GUID
+---@param TargetAUNameOrID string @ destination unit name (unique) or GUID
+---@return boolean @ true if successful
+---Example: ScenEdit_DuplicateEmconConfigToUnit('green', 'USS Ulysess', 'USS Troy')
+function ScenEdit_DuplicateEmconConfigToUnit(PresetAlertID, SourceAUNameOrID, TargetAUNameOrID) end
+
+---Exports doctrine settings to an XML file. PRO ONLY.
+---@param paramTable table @ {side, unitname?, guid?, mission?, filename} — filename has no extension; saved to Command Defaults path
+---@return string @ doctrine as XML string
+---Example: ScenEdit_ExportDoctrineToXML({side='USA', filename='mySideDoctrine'})
+function ScenEdit_ExportDoctrineToXML(paramTable) end
+
+---Imports doctrine settings from an XML file. PRO ONLY.
+---@param paramTable table @ {side, unitname?, guid?, mission?, filename} — filename has no extension; loaded from Command Defaults path
+---@return string @ the original (pre-import) doctrine as XML string
+---Example: ScenEdit_ImportDoctrineFromXML({side='USA', filename='mySideDoctrine'})
+function ScenEdit_ImportDoctrineFromXML(paramTable) end
+
+---Returns the SHA hash of a database file. PRO ONLY.
+---@param paramTable table @ {filename} — full path and filename of the DB file
+---@return string @ SHA hash string
+---Example: ScenEdit_GetDBFileHash({filename='D:/Matrix Games/Command Modern Operations/DB/CWDB_439.db3'})
+function ScenEdit_GetDBFileHash(paramTable) end
+
+---Returns sensor data fields from the database for a given sensor DBID. PRO ONLY.
+---@param Sensor_DBID number @ sensor database ID
+---@return table @ sensor data fields from the database record
+---Example: ScenEdit_GetSensorData(1234)
+function ScenEdit_GetSensorData(Sensor_DBID) end
+
+---Gets the intermittent emission configuration for a unit at a specific EMCON alert level.
+---@param AUNameOrID string @ unit name (unique across scenario) or GUID
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@return table @ configuration table with emission interval settings and wake conditions
+---Example: ScenEdit_GetUnitIntermittentEmissionConfig('USS Ulysess', 'Green')
+function ScenEdit_GetUnitIntermittentEmissionConfig(AUNameOrID, PresetAlertID) end
+
+---Locks or unlocks the simulation fidelity and time compression controls in the UI. PRO ONLY.
+---@param IsLocked boolean @ true to lock controls, false to unlock
+function ScenEdit_LockSimulationFidelity(IsLocked) end
+
+---Merges multiple units into a single unit (the first unit in the list is kept).
+---@param unitList table @ table of unit names or GUIDs to merge
+---@return CMO__Unit @ the merged unit wrapper
+---Example: local merged = ScenEdit_MergeUnits({'Unit1', 'Unit2'})
+function ScenEdit_MergeUnits(unitList) end
+
+---Splits a unit into its component mounts as separate independent units.
+---@param CMO__UnitSelector CMO__UnitSelector @ {name?, guid?} of the unit to split
+---@return table @ array of unit wrappers, one per split component mount
+---Example: ScenEdit_SplitUnit({name='Mech Inf', guid='ff0ef686-bf03-4228-af7c-a726f8c178cf'})
+function ScenEdit_SplitUnit(CMO__UnitSelector) end
+
+---Sets the data export output rate for a specific export type. PRO ONLY.
+---@param type string @ currently only 'UnitPositions'
+---@param rate string @ "CONTINUOUS"|"1SECOND"|"2SECONDS"|"5SECONDS"|"15SECONDS"|"30SECONDS"|"1MINUTE"|"5MINUTES"|"15MINUTES"|"30MINUTES"|"1HOUR"|"6HOURS"|"12HOURS"|"24HOURS"|"MATCHSIMSPEED"
+---@return boolean @ true if successful
+---Example: ScenEdit_SetExportOutputRate('UnitPositions', '30Seconds')
+function ScenEdit_SetExportOutputRate(type, rate) end
+
+---Sets the active EMCON alert level for all units on a side.
+---@param SideNameOrID string @ side name or GUID
+---@param PresetAlertID string @ "GREEN"|"BLUE"|"YELLOW"|"ORANGE"|"RED"|"CUSTOM"|"ALL"
+---@return boolean @ true if successful
+---Example: ScenEdit_SetSideEmconAlertness("Canada", "red")
+function ScenEdit_SetSideEmconAlertness(SideNameOrID, PresetAlertID) end
+
+---Transfers specified mounts from one unit to another.
+---@param fromUnit string @ source unit name or GUID
+---@param toUnit string @ destination unit name or GUID
+---@param mountGuids table @ array of mount GUIDs to transfer
+---@return boolean
+---Example: ScenEdit_TransferMount('Source Unit', 'Target Unit', {'mount-guid-1','mount-guid-2'})
+function ScenEdit_TransferMount(fromUnit, toUnit, mountGuids) end
+
+---Converts a zone from one type to another.
+---@param SideNameOrID string @ side name/GUID owning the zone; use 'Nature' for custom environment zones
+---@param ZoneNameOrID string @ zone name or GUID
+---@param TargetType string @ "exclusion"|"nonav"|"standard"|"customenvironment"
+---@return string @ empty string "" on success, error message on failure
+---Example: ScenEdit_TransformZone('sidea', 'no-go zone', 'exclusion')
+function ScenEdit_TransformZone(SideNameOrID, ZoneNameOrID, TargetType) end
+
+---Enables or disables a named realism/simulation setting.
+---@param RealismSettingString string @ realism setting enum name (e.g. "DetailedGunFireControl")
+---@param enabled boolean @ true to enable, false to disable
+---@return boolean @ true if the setting name is valid
+---Example: ScenEdit_UpdateRSetting("DetailedGunFireControl", true)
+function ScenEdit_UpdateRSetting(RealismSettingString, enabled) end
+
+---Returns the current weapon allocation for a unit against a contact.
+---@param attackerID string @ attacking unit GUID; pass nil to query all shooters on a side
+---@param contactId string @ contact GUID being attacked
+---@param attackingSideID? string @ [optional] attacking side GUID; used when attackerID is nil
+---@return table @ array of {shooter, qtyAssigned, weapon, weaponName, target, qtyFired}
+---Example: ScenEdit_WeaponAllocation('attackerGUID', 'contactGUID')
+function ScenEdit_WeaponAllocation(attackerID, contactId, attackingSideID) end
+
+
+---Sets a value in the event exporter configuration (e.g. Tacview).
+---Category and Setting are case-sensitive. Stored in Config\EventExport.ini.
+---Tacview category available in all editions; other categories require PRO.
+---@param Category string @ exporter category (e.g. 'Tacview Settings')
+---@param Setting string @ parameter name (e.g. 'UseCustomUnitExportFrequency')
+---@param Value string @ value to set
+---Example: Exporter_SetSetting('Tacview Settings', 'UseCustomUnitExportFrequency', 'False')
+function Exporter_SetSetting(Category, Setting, Value) end
+
+
+---Shows a simple dialog with custom buttons and returns the label of the button pressed.
+---@param title string @ dialog box title
+---@param description string @ dialog body message
+---@param interactions table @ array of button label strings
+---@return string @ label of the button pressed by the user
+---Example: local choice = UI_CallAdvancedDialog("Select", "Choose one:", {"Option A","Option B","Cancel"})
+function UI_CallAdvancedDialog(title, description, interactions) end
+
+---Opens the database viewer window for a specific platform or weapon record.
+---@param SelectedObjectType string @ "Aircraft"|"Ship"|"Submarine"|"Facility"|"Ground Unit"|"Satellite"|"Weapon"|"Sensor"
+---@param SelectedObjectID number @ database ID of the object
+---Example: UI_OpenNewDatabaseWindow("aircraft", 10)
+function UI_OpenNewDatabaseWindow(SelectedObjectType, SelectedObjectID) end
+
+---Prompts the user to select units from one or more specified sides.
+---@param paramTable table @ selection parameters (undocumented)
+function UI_SelectUnitsPrompt_FromSides(paramTable) end
+
+---Prompts the user to select units from the player's own side.
+---@param paramTable table @ selection parameters (undocumented)
+function UI_SelectUnitsPrompt_OwnSide(paramTable) end
+
+
+-- ============================================================
+-- New wrapper classes (added from Wrappers.html / Tables.html)
+-- ============================================================
+
+---@class CMO__MissionCargo:table @ Cargo mission type-specific options.
+---@field subtype? string @ Cargo mission subtype
+---@field OneThirdRule? boolean @ Enforce the one-third rule
+---@field TransitThrottleAircraft? string|number @ Transit throttle preset for aircraft
+---@field TransitAltitudeAircraft? string|number @ Transit altitude preset or value for aircraft
+---@field StationThrottleAircraft? string|number @ Station throttle preset for aircraft
+---@field StationAltitudeAircraft? string|number @ Station altitude preset or value for aircraft
+---@field TransitThrottleSubmarine? string|number @ Transit throttle preset for submarines
+---@field TransitDepthSubmarine? string|number @ Transit depth preset or value for submarines
+---@field StationThrottleSubmarine? string|number @ Station throttle preset for submarines
+---@field StationDepthSubmarine? string|number @ Station depth preset or value for submarines
+---@field TransitThrottleShip? string|number @ Transit throttle preset for ships
+---@field StationThrottleShip? string|number @ Station throttle preset for ships
+---@field UseFlightSize? boolean @ Enforce flight size restrictions
+---@field UseGroupSize? boolean @ Enforce group size restrictions for ships/subs
+---@field Zone? table @ Reference point names/GUIDs defining the pickup zone
+---@field DestinationUnitID? string @ GUID of the destination unit
+---@field MoveAllCargo? boolean @ Move all available cargo in one trip
+---@field AllowGroundUnitSelfDeliveryFromCargo? boolean @ Allow ground units to self-deliver from cargo bay
+
+---@class CMO__Signature:table @ Unit sensor signature profile.
+---@field loadout? number @ Loadout DBID that produced this signature
+---@field type? string @ Broadband sensor type string (front)
+---@field typeN? string @ Narrowband sensor type string
+---@field textFront? string @ Human-readable front signature label
+---@field textSide? string @ Human-readable side signature label
+---@field textRear? string @ Human-readable rear signature label
+---@field rcsFront? number @ Radar cross-section (front) in square metres
+---@field rcsSide? number @ Radar cross-section (side)
+---@field rcsRear? number @ Radar cross-section (rear)
+---@field sqmFront? number @ Signature in square metres (front)
+---@field sqmSide? number @ Signature in square metres (side)
+---@field sqmRear? number @ Signature in square metres (rear)
+
+---@class CMO__TargetPriority:table @ One entry in a doctrine target priority list.
+---@field unit_type number @ General unit type code (0 = any)
+---@field unit_subtype number @ Unit subtype code (0 = any)
+---@field isfixedfacilitysubtype boolean @ True if unit_subtype is a fixed-facility category
+---@field dbid number @ Database ID of the specific unit class (0 = any)
+---@field priority number @ 1-based position in the priority list
+
+---@class CMO__CargoItem:table @ A single cargo item assigned to or present in a cargo bay.
+---@field type number @ Cargo object type (CMO__Constants.CargoType)
+---@field dbid number @ Database ID of the cargo item
+---@field GUID string @ GUID of the specific cargo unit/object
+---@field quantity number @ Quantity (for mount-type cargo)
