@@ -1454,6 +1454,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 ---@field ScriptText? string @ escaped text of the LuaScript [LuaScript]
 ---@field MissionID? string @ guid of the missions [ChangeMissionStatus]
 ---@field NewStatus? number @ 1 for active and 2 for inactive [ChangeMissionStatus]
+---@field scriptfor? number @ 0 for action events, 1 for action waypoints
 
 
 ---Used when creating updating or removing a Condition.
