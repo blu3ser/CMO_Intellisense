@@ -1303,6 +1303,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 
 ---@class CMO__Waypoint:table @ A waypoint entry. for instance a units.course property would return a table of these if it had a course.
+---@field actionId string @ EventAction GUID/NAME to be executed once the unit reach the waypoint
 ---@field longitude number @ decimal
 ---@field latitude number @ decimal
 ---@field description string @ The description displayed in the gui for this entry.
