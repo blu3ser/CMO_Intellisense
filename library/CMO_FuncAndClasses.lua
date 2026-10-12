@@ -481,7 +481,51 @@ function CMO__Side:contactsBy(UnitType) end
 ---@return table |nil @Returns a numerical indexed table of units {name, guid} or nil on no match.
 function CMO__Side:unitsInArea(AreaAndTargetFilerTable) end
 
+---Creates a new network on this side.
+---@param netName string @Name of the network to create.
+---@return CMO__Network|nil @The new network wrapper, or nil on failure.
+function CMO__Side:createNetwork(netName) end
+
+---Removes a network, and all its members, from this side.
+---@param netName string @Name of the network to remove.
+function CMO__Side:removeNetwork(netName) end
+
+---Adds a unit to a network on this side.
+---@param netName string @Name of the network to add the unit to.
+---@param unitGuid string @GUID of the unit to add.
+function CMO__Side:addUnitToNetwork(netName,unitGuid) end
+
+---Removes a unit from a network on this side.
+---@param netName string @Name of the network to remove the unit from.
+---@param unitGuid string @GUID of the unit to remove.
+function CMO__Side:removeUnitFromNetwork(netName,unitGuid) end
+
 ---@alias CMO__TableOfSides table<number,CMO__Side>
+
+--- A comms network belonging to a side. Obtained from CMO__Side:createNetwork().
+--- NOTE: work in progress in the game API - there is no GetNetwork() yet and some
+--- members may not behave as documented.
+---@class CMO__Network
+local CMO__Network = {} ----dummy entry to attach funcs
+---Adds a unit to this network.
+---@param unitGuid string @GUID of the unit to add.
+function CMO__Network:addUnit(unitGuid) end
+
+---Removes a unit from this network.
+---@param unitGuid string @GUID of the unit to remove.
+function CMO__Network:removeUnit(unitGuid) end
+
+---Removes all units from this network. The network itself remains.
+function CMO__Network:clear() end
+
+---Deletes this network from its side.
+function CMO__Network:remove() end
+
+---Returns a string representation of this network.
+---@return string
+function CMO__Network:tostring() end
+
+---@alias CMO__TableOfNetworks table<integer,CMO__Network>
 
 ---@class CMO__AreaTableAndTargetFilterTable:table
 ---@field Area table @a table containing at least lat and lons, or rps, representing defining the area.
@@ -1131,6 +1175,18 @@ function CMO__Unit:dropSonobuoy(active, shallow) end
 ---theSat:updateorbit({TLE=theTLE})
 ---Deletes a unit
 function CMO__Unit:delete() end
+
+---Adds this unit to a network on its side.
+---@param networkId string @ID of the network to join.
+function CMO__Unit:addToNet(networkId) end
+
+---Removes this unit from a network on its side.
+---@param networkId string @ID of the network to leave.
+function CMO__Unit:removeFromNet(networkId) end
+
+---Returns the networks this unit is a member of.
+---@return CMO__TableOfNetworks @Table of network wrappers.
+function CMO__Unit:getNets() end
 
 ---CMO__ActiveUnitTypeEnum:  
 ---None=0, Aircraft=1,Ship=2,Submarine=3,Facility=4,Aimpoint=5,Weapon=6,Satellite=7

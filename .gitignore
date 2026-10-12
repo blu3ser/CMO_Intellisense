@@ -1,0 +1,6 @@
+*.py
+*.pyc
+__pycache__/
+/cmo-api-mcp/
+/NETWORKS_WIP.md
+*.gitignore
