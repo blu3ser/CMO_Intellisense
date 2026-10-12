@@ -76,7 +76,7 @@ CMO version at time: 1.05.1309.10
 ---@field addasacell? boolean @Default true. If false, add only one weapon to a cell
 
 ---@class CMO__TargetInformation:table @Target information for units
----@field CMO_Contact @ The Contact information of the unit
+---@field CMO_Contact CMO__Contact@ The Contact information of the unit
 ---@class CMO__Enum_Table:table @ definitions for _enumTable_ global taken from .net LuaEnuNames
 ---@field Altitude table @ table of altitude presets [enum]=stringname
 ---@field Condition_Air table @ table of possible conditions for air units. [enum]=stringname
@@ -1359,6 +1359,7 @@ function CMO__DeviceMagazine:setExactWeaponQuantity(guid,quantity) end
 
 
 ---@class CMO__Waypoint:table @ A waypoint entry. for instance a units.course property would return a table of these if it had a course.
+---@field actionId string @ EventAction GUID/NAME to be executed once the unit reach the waypoint
 ---@field longitude number @ decimal
 ---@field latitude number @ decimal
 ---@field description string @ The description displayed in the gui for this entry.
@@ -1686,6 +1687,7 @@ function CMO__Doctrine:deleteTargetPriorityEntry(listIndex) end
 ---@field ScriptText? string @ escaped text of the LuaScript [LuaScript]
 ---@field MissionID? string @ guid of the missions [ChangeMissionStatus]
 ---@field NewStatus? number @ 1 for active and 2 for inactive [ChangeMissionStatus]
+---@field scriptfor? number @ 0 for action events, 1 for action waypoints
 
 
 ---Used when creating updating or removing a Condition.
